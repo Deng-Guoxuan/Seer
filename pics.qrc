@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/Image">
+        <file>pictures/MengBuBuZhongZi.png</file>
+        <file>pictures/pirate1.png</file>
+        <file>pictures/Capsule.png</file>
+        <file>pictures/base.png</file>
+        <file>pictures/Map1.png</file>
+        <file>pictures/pirate2.png</file>
+        <file>pictures/bag.png</file>
+        <file>pictures/greenBullet.png</file>
+    </qresource>
+</RCC>
