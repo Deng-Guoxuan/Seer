@@ -1,5 +1,7 @@
 #include "spirits.h"
 #include "greenbullet.h"
+#include "redbullet.h"
+#include "bluebullet.h"
 
 const int PIX=64;//一格的像素
 
@@ -49,12 +51,22 @@ void Spirits::addBullet(){
         return;
     }
     else{
+        Point p1(this->getX()+PIX/2,this->getY()+PIX/2);//精灵的中心点
+        Point p2(this->_target->getX()+PIX/2,this->_target->getY()+PIX/2);//目标的中心点
         switch (this->_type){
         case 1:                   //萌布布种子:绿子弹
         {
-            Point p1(this->getX()+PIX/2,this->getY()+PIX/2);//精灵的中心点
-            Point p2(this->_target->getX()+PIX/2,this->_target->getY()+PIX/2);//目标的中心点
             this->_bulletVector.push_back(new GreenBullet(p1,p2));
+            break;
+        }
+        case 2:
+        {
+            this->_bulletVector.push_back(new RedBullet(p1,p2));
+            break;
+        }
+        case 3:
+        {
+            this->_bulletVector.push_back(new BlueBullet(p1,p2));
             break;
         }
         default:

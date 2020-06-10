@@ -1,5 +1,7 @@
 #include "selectionbox.h"
 
+const int PIX=64;
+
 SelectionBox::SelectionBox(QString imagePath):
     _p(0,0),_imagePath(imagePath){}
 
@@ -15,7 +17,26 @@ void SelectionBox::clickOne(int x, int y)
     this->_subButtons[0].setX(this->getX());
     this->_subButtons[0].setY(this->getY());
     this->_subButtons[0].setImagePath(":/Image/pictures/MengBuBuZhongZi.png");
-
+    //萌火猴：右上
+    this->_subButtons[1].setX(this->getX()+PIX);
+    this->_subButtons[1].setY(this->getY());
+    this->_subButtons[1].setImagePath(":/Image/pictures/MengHuoHou.png");
+    //萌伊尤：左中
+    this->_subButtons[2].setX(this->getX());
+    this->_subButtons[2].setY(this->getY()+PIX);
+    this->_subButtons[2].setImagePath(":/Image/pictures/MengYiYou.png");
+    //雷伊：右中
+    this->_subButtons[3].setX(this->getX()+PIX);
+    this->_subButtons[3].setY(this->getY()+PIX);
+    this->_subButtons[3].setImagePath(":/Image/pictures/LeiYi.png");
+    //英卡洛斯：左下
+    this->_subButtons[4].setX(this->getX());
+    this->_subButtons[4].setY(this->getY()+2*PIX);
+    this->_subButtons[4].setImagePath(":/Image/pictures/YingKaLuoSi.png");
+    //谱尼：右下
+    this->_subButtons[5].setX(this->getX()+PIX);
+    this->_subButtons[5].setY(this->getY()+2*PIX);
+    this->_subButtons[5].setImagePath(":/Image/pictures/PuNi.png");
 
     this->_display = true; //显示状态设为真
 }

@@ -19,8 +19,9 @@ public:
     void setLife(int life);//设置血量
     QString getImagePath()const;//取得图片路径
     int getID()const;//获得海盗类型
-    bool EndOrMove();//海盗移动
+    bool pirateMove();//海盗移动
     int getReward()const;
+    bool isEnd();//判断是不是到终点了
 
 protected:
     int _speed;//移动速度

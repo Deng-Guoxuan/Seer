@@ -29,25 +29,33 @@ SOURCES += \
         mainwindow.cpp \
     spirits.cpp \
     pirates.cpp \
-    spirithouses.cpp \
     mengbubuzhongzi.cpp \
     selectionbox.cpp \
     point.cpp \
     subbutton.cpp \
     bullet.cpp \
-    greenbullet.cpp
+    greenbullet.cpp \
+    menghuohou.cpp \
+    redbullet.cpp \
+    mengyiyou.cpp \
+    bluebullet.cpp \
+    capsule.cpp
 
 HEADERS += \
         mainwindow.h \
     spirits.h \
     pirates.h \
-    spirithouses.h \
     mengbubuzhongzi.h \
     selectionbox.h \
     point.h \
     subbutton.h \
     bullet.h \
-    greenbullet.h
+    greenbullet.h \
+    menghuohou.h \
+    redbullet.h \
+    mengyiyou.h \
+    bluebullet.h \
+    capsule.h
 
 FORMS += \
         mainwindow.ui

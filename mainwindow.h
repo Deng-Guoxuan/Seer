@@ -7,7 +7,7 @@
 #include <QMediaPlayer>
 #include <QMouseEvent>             //鼠标事件
 #include <QLabel>                  //标签
-#include "spirithouses.h"
+#include "capsule.h"
 #include "pirates.h"
 #include "spirits.h"
 #include "selectionbox.h"
@@ -38,7 +38,7 @@ private:
     int _life=10;//生命值
     const Point _base=Point(192,128);//基地位置，敌人进入即游戏结束（可以设置最大进入人数）
     bool _displayAllRange=false;//一键显示所有精灵攻击范围
-    QVector <SpiritHouses*> _capsuleVector;//精灵屋类数组
+    QVector <Capsule*> _capsuleVector;//精灵屋类数组
     QVector <Pirates*> _pirateVector;//海盗类数组
     QVector <Spirits*> _spiritsVector;//精灵类数组
     SelectionBox* _bag=new SelectionBox(":/Image/pictures/bag.png"); //选择框类
@@ -47,6 +47,7 @@ private:
     bool _theEnd=false;//结束标记
     QLabel* _winLabel=new QLabel(this);//胜利标签
     QLabel* _loseLabel=new QLabel(this);//失败标签
+    int _pirateBlank=3000;//插入海盗的间隔时间,根据海盗难度调整
 
     void DrawMap1(QPainter& painter);//画出地图Map1
     void setPiratesWave(Point **path1, Point *entrance, int* pathLengths);//设置每波海盗的形式
@@ -58,6 +59,9 @@ private:
     bool canBuy(int cost);//判断是否能购买，能即true
     bool inRange(int distance,int range);//判断海盗是否进入攻击范围
     bool bingo(Point&bulletP,Point&pirateP);//判断子弹是否击中海盗
+    void setCapsuleOccupied(const Point&p,const int k);//标记已有精灵的胶囊
+    int getPirateBlank()const;
+    void setPirateBlank(const int blank);
 
 };
 

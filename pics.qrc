@@ -8,5 +8,12 @@
         <file>pictures/pirate2.png</file>
         <file>pictures/bag.png</file>
         <file>pictures/greenBullet.png</file>
+        <file>pictures/blueBullet.png</file>
+        <file>pictures/MengHuoHou.png</file>
+        <file>pictures/MengYiYou.png</file>
+        <file>pictures/redBullet.png</file>
+        <file>pictures/LeiYi.png</file>
+        <file>pictures/PuNi.png</file>
+        <file>pictures/YingKaLuoSi.png</file>
     </qresource>
 </RCC>

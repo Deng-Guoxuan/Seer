@@ -1,9 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "spirithouses.h"    //精灵房子位置
+#include "capsule.h"    //精灵房子位置
 #include "mengbubuzhongzi.h" //萌布布种子
 #include <QPushButton>       //按键
 #include "windows.h"
+#include "menghuohou.h"
+#include "mengyiyou.h"
 
 const int PIX=64;//一格64像素
 
@@ -48,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     player->play();
 
     QTimer* timer1 = new QTimer(this);      //用于插入海盗定时器
-    timer1->start(2000);
+    timer1->start(this->getPirateBlank());      //插入海盗的间隔时间
     connect(timer1,&QTimer::timeout,[=](){                          //设置路径点
         Point* path1[]={new Point(6*PIX,6*PIX),new Point(8*PIX,6*PIX),new Point(8*PIX,5*PIX),new Point(13*PIX,5*PIX),
                         new Point(13*PIX,6*PIX),new Point(14*PIX,6*PIX),new Point(14*PIX,7*PIX),new Point(10*PIX,7*PIX),
@@ -61,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
         Point entrance[]={Point(6*PIX, 5*PIX)};//入口位置
         int pathLengths[]={sizeof(path1)/sizeof(Point*)};//路径的结点个数
         setPiratesWave(path1, entrance, pathLengths);   //使用预设的1条路产生怪物方案
+        timer1->setInterval(this->getPirateBlank());//修改海盗出现时间间隔
     });
 
     //
@@ -73,10 +76,17 @@ MainWindow::MainWindow(QWidget *parent) :
             this->close();
         }
 
-        for (auto Moni = this->_pirateVector.begin(); Moni != this->_pirateVector.end(); Moni++){
-            if((*Moni)->EndOrMove()){                   //怪物走到终点
-                delete *Moni;
-                this->_pirateVector.erase(Moni);         //海盗走到终点则删除这个海盗
+        for (auto pirate = this->_pirateVector.begin(); pirate != this->_pirateVector.end(); pirate++){
+            if((*pirate)->isEnd()){                   //海盗走到终点
+
+                //判断一下所有精灵的目标海盗是否和当前删除的海盗重复，如果重复，则将那一个精灵的目标海盗也设为空
+                for (auto spirit : this->_spiritsVector){
+                    if (spirit->getTarget() == *pirate){
+                        spirit->setTarget(NULL);
+                    }
+                }
+                delete *pirate;
+                this->_pirateVector.erase(pirate);         //海盗走到终点则删除这个海盗
 
                 this->_life--;//减生命
                 this->_lifeLabel->setText(QString("Life:%1").arg(this->_life));//刷新生命标签
@@ -88,7 +98,9 @@ MainWindow::MainWindow(QWidget *parent) :
                 else{}
                 break;
             }
-            else continue;
+            else{
+                (*pirate)->pirateMove();//海盗移动
+            }
         }
 
         //精灵寻找目标海盗的规律：找到最前一个海盗作为目标，目标丢失后找再继续找下一个目标
@@ -239,7 +251,7 @@ void MainWindow::DrawMap1(QPainter &painter){
     int sumHouses=sizeof(capsules)/sizeof(Point(1,1));
     for(int i=0;i<sumHouses;i++){
         painter.drawPixmap(capsules[i].getX(),capsules[i].getY(),PIX,PIX,QPixmap(":Image/pictures/Capsule.png"));//画出精灵屋
-        this->_capsuleVector.push_back(new SpiritHouses(capsules[i].getX(),capsules[i].getY()));//并记录下这些精灵屋的位置到Vector中
+        this->_capsuleVector.push_back(new Capsule(capsules[i].getX(),capsules[i].getY()));//并记录下这些精灵屋的位置到Vector中
     }
 
 }
@@ -256,9 +268,16 @@ void MainWindow::setPiratesWave(Point **path1, Point *entrance, int*pathLengths)
         addPirate(1,ways[0],pathLengths[0],entrance[0]); //海盗类型，路径，路径长度，起始点
     }
     else if(this->_count>=10 && this->_count<=14){
+        this->setPirateBlank(1000);
         addPirate(2,ways[0],pathLengths[0],entrance[0]);
     }
-    else if(this->_count>=15){
+    else if(this->_count>=15 && this->_count<=30){
+        this->setPirateBlank(2000);
+        addPirate(1,ways[0],pathLengths[0],entrance[0]);
+        addPirate(2,ways[0],pathLengths[0],entrance[0]);
+
+    }
+    else if(this->_count>=31){
         if(this->_pirateVector.empty()){                 //海盗出完了,且海盗打完了
             this->_winLabel->show();
             this->_theEnd=true;
@@ -303,11 +322,13 @@ void MainWindow::DrawSelectionBox(QPainter &painter){
     }
     else{
         //画出选择框
-         painter.drawPixmap(this->_bag->getX(),this->_bag->getY(),132,200,QPixmap(this->_bag->getImgPath()));
+         painter.drawPixmap(this->_bag->getX(),this->_bag->getY(),2*PIX,3*PIX,QPixmap(this->_bag->getImgPath()));
 
          //画出子按钮
          SubButton* copySubButtons = this->_bag->getSubButtons();//接收子按钮结构数组
-         painter.drawPixmap(copySubButtons[0].getX(),copySubButtons[0].getY(),PIX,PIX,QPixmap(copySubButtons[0].getImagePath()));
+         for(int i=0;i<6;i++){
+             painter.drawPixmap(copySubButtons[i].getX(),copySubButtons[i].getY(),PIX,PIX,QPixmap(copySubButtons[i].getImagePath()));
+         }
 
          painter.setPen(QPen(Qt::yellow, 6, Qt::SolidLine));//设置画笔，黄色，实线
          painter.drawRect(QRect(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX,PIX,PIX));//将选中区域用黄色实线框起来
@@ -321,6 +342,17 @@ bool MainWindow::clickThisBlock(int mouseX, int mouseY, int blockX, int blockY){
     else return false;
 }
 
+void MainWindow::setCapsuleOccupied(const Point &p, const int k){
+    for(auto capsule:this->_capsuleVector){
+        Point p2(capsule->getX(),capsule->getY());
+        if(getLength(p,p2)==0){
+            capsule->setOccupied(k);
+        }
+        else continue;
+    }
+}
+
+
 void MainWindow::mousePressEvent(QMouseEvent *ev){
     if(ev->button()!=Qt::LeftButton){
         return;                          //如果不是鼠标左键点击，则不做反应
@@ -330,7 +362,7 @@ void MainWindow::mousePressEvent(QMouseEvent *ev){
         SubButton* clickSubButton=this->_bag->getSubButtons();
         for(int i=0;i<6;i++){
             //如果点到了背包中的该精灵的位置，且该背包此时是显示出来的情况下
-            if((clickThisBlock(ev->x(),ev->y(),clickSubButton[i].getX(),clickSubButton[i].getY())==true) && (this->_bag->getDisplay()==true)){
+            if((clickThisBlock(ev->x(),ev->y(),clickSubButton[i].getX(),clickSubButton[i].getY())) && (this->_bag->getDisplay())){
                 this->_bag->setDisplay(false);//准备关掉背包
 
                 //根据i的选择加入新的精灵到Vector中
@@ -339,12 +371,33 @@ void MainWindow::mousePressEvent(QMouseEvent *ev){
                 {
                     if(this->canBuy(100)==true){    //够钱
                         this->_spiritsVector.push_back(new MengBuBuZhongZi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                        this->setCapsuleOccupied(p1,1);
                     }
+
+                    break;
+                }
+                case 1://萌火猴
+                {
+                    if(this->canBuy(100)==true){    //够钱
+                        this->_spiritsVector.push_back(new MengHuoHou(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                        this->setCapsuleOccupied(p1,2);
+                    }
+                    break;
+                }
+                case 2://萌伊尤
+                {
+                    if(this->canBuy(100)==true){    //够钱
+                        this->_spiritsVector.push_back(new MengYiYou(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                        this->setCapsuleOccupied(p1,3);
+                    }
+
                     break;
                 }
                 default:break;
                 }
-
                 update();//更新
                 return;
             }
@@ -356,7 +409,15 @@ void MainWindow::mousePressEvent(QMouseEvent *ev){
         for(auto capsule:this->_capsuleVector){
             //判断点击塔坑
             if(clickThisBlock(ev->x(),ev->y(),capsule->getX(),capsule->getY())){  //选到了一个塔坑
-                this->_bag->clickOne(capsule->getX(),capsule->getY());                  //设置选择框位置并显示出来
+                switch (capsule->getOccupied()) {
+                case 0:               //该位置为空
+                {
+                    this->_bag->clickOne(capsule->getX(),capsule->getY());                  //设置选择框位置并显示出来
+                    break;
+                }
+                default:break;
+                }
+
                 update();//更新
                 return;
             }
@@ -390,3 +451,12 @@ bool MainWindow::bingo(Point &bulletP, Point &pirateP){
     }
     else return false;
 }
+
+void MainWindow::setPirateBlank(const int blank){
+    this->_pirateBlank=blank;
+}
+
+int MainWindow::getPirateBlank()const{
+    return this->_pirateBlank;
+}
+

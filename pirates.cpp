@@ -60,8 +60,15 @@ int Pirates::getID()const{
     return this->_id;
 }
 
+bool Pirates::isEnd(){
+    if(this->_turningPoints.empty()){
+        return true;                      //到达了终点
+    }
+    else return false;
+}
+
 //海盗按设定路径点移动
-bool Pirates::EndOrMove()
+bool Pirates::pirateMove()
 {
     if(this->_turningPoints.empty()){
         return true;                      //到达了终点
