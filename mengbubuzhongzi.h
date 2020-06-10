@@ -8,6 +8,7 @@ class MengBuBuZhongZi : public Spirits
 {
 public:
     MengBuBuZhongZi(int x,int y);
+
 };
 
 #endif // MENGBUBUZHONGZI_H

@@ -27,6 +27,12 @@ public:
     void fireBullets();//管理该精灵所有子弹的移动
     void eraseBullet(Bullet** i);//删除第i个子弹
 
+    int getLife()const;
+    int getFullLife()const;
+    void setLife(const int life);
+    int getType()const;
+
+    void addLife(QVector<Spirits*>&spiritsVector);//只有萌布布种子才构造了这个函数
 
 protected:
     int _type;//精灵种类
@@ -35,6 +41,8 @@ protected:
     int _cost;//价钱
     int _fireBlank;//攻击间隔
     int _countBlank=0;//一直变动,用来计算攻击间隔
+    int _life;//生命
+    int _fullLife;//生命上限
     QString _imagePath;//对应图片路径
     QString _rangeColor;//攻击范围的颜色
 

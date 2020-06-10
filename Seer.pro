@@ -39,7 +39,8 @@ SOURCES += \
     redbullet.cpp \
     mengyiyou.cpp \
     bluebullet.cpp \
-    capsule.cpp
+    capsule.cpp \
+    blackbullet.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -55,7 +56,8 @@ HEADERS += \
     redbullet.h \
     mengyiyou.h \
     bluebullet.h \
-    capsule.h
+    capsule.h \
+    blackbullet.h
 
 FORMS += \
         mainwindow.ui

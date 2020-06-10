@@ -9,10 +9,12 @@ Bullet::Bullet(Point&startPoint, Point &targetPoint):
     this->_l=getLength(startPoint,targetPoint);//方向向量的模长
 }
 
+//中心坐标X
 int Bullet::getX()const{
     return this->_nowPosition.getX();
 }
 
+//中心坐标Y
 int Bullet::getY()const{
     return this->_nowPosition.getY();
 }

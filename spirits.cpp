@@ -7,6 +7,9 @@ const int PIX=64;//一格的像素
 
 Spirits::Spirits(int x, int y):_p(x,y){}
 
+int Spirits::getType()const{
+    return this->_type;
+}
 
 int Spirits::getX()const{
     return this->_p.getX();
@@ -92,6 +95,10 @@ void Spirits::fireBullets(){
         }
 }
 
+int Spirits::getFullLife()const{
+    return this->_fullLife;
+}
+
 void Spirits::eraseBullet(Bullet **i){
     for(auto bullet=this->_bulletVector.begin();bullet<this->_bulletVector.end();bullet++){
         if(bullet==i){
@@ -99,4 +106,12 @@ void Spirits::eraseBullet(Bullet **i){
         }
         else continue;
     }
+}
+
+int Spirits::getLife()const{
+    return this->_life;
+}
+
+void Spirits::setLife(const int life){
+    this->_life=life;
 }

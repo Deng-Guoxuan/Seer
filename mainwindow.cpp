@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setFixedSize(1152,640);//设置窗口大小
     setWindowTitle("Seer");//设置窗口名称
 
+
+
     this->_moneyLabel->setGeometry(10*PIX,0.75*PIX,3*PIX,PIX/2);//位置
     this->_moneyLabel->setFont(QFont("微软雅黑",12,75));//字体，大小，粗细
     this->_moneyLabel->setStyleSheet("background-color:whitesmoke;color:goldenrod");//背景颜色，字体颜色
@@ -68,118 +70,225 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //
     QTimer* timer2=new QTimer(this);
-    timer2->start(120);
+    timer2->start(150);
     connect(timer2,&QTimer::timeout,[=](){
-        //海盗移动
-        if(this->_theEnd){
+        if(this->_theEnd){          //结束标记
             Sleep(5000);
             this->close();
         }
+        this->allPiratesMove();//界面所有海盗移动
+        this->allSpiritsFindTarget();//界面所有精灵找目标
 
-        for (auto pirate = this->_pirateVector.begin(); pirate != this->_pirateVector.end(); pirate++){
-            if((*pirate)->isEnd()){                   //海盗走到终点
+        this->bingoPirateEvent();//击中海盗事件
 
-                //判断一下所有精灵的目标海盗是否和当前删除的海盗重复，如果重复，则将那一个精灵的目标海盗也设为空
-                for (auto spirit : this->_spiritsVector){
-                    if (spirit->getTarget() == *pirate){
-                        spirit->setTarget(NULL);
-                    }
-                }
-                delete *pirate;
-                this->_pirateVector.erase(pirate);         //海盗走到终点则删除这个海盗
+        this->allPirateFindTarget();//界面所有海盗找目标
 
-                this->_life--;//减生命
-                this->_lifeLabel->setText(QString("Life:%1").arg(this->_life));//刷新生命标签
+        this->bingoSpiritEvent();//击中精灵事件
+        update();//画图
+    });
 
-                if(this->_life<=0){
-                    this->_loseLabel->show();
-                    this->_theEnd=true;
-                }
-                else{}
-                break;
-            }
-            else{
-                (*pirate)->pirateMove();//海盗移动
-            }
-        }
-
-        //精灵寻找目标海盗的规律：找到最前一个海盗作为目标，目标丢失后找再继续找下一个目标
-        for (auto spirit : this->_spiritsVector){       //遍历精灵
-            if(!spirit->getTarget()){                   //若当前没有目标海盗
-                for(int i = 0; i <=this->_pirateVector.size() - 1; i++){                 //遍历海盗
-                    //这里以精灵中心点和怪物中心点判断
-                    Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);
-                    Point p2(this->_pirateVector.at(i)->getX()+PIX/2,this->_pirateVector.at(i)->getY()+PIX/2);
-                    if (this->inRange(getLength(p1,p2),spirit->getRange())){             //如果在攻击范围内
-                        spirit->setTarget(this->_pirateVector.at(i));                    //设置精灵的目标怪物
-                        break;                                                           //找到后立刻跳出循环
-                    }
-                    else{}
-                }
-            }
-            else{                 //当前已经有了目标海盗
-                //先判断在不在攻击范围内
-                Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);//精灵中心点
-                Point p2(spirit->getTarget()->getX()+PIX/2,spirit->getTarget()->getY()+PIX/2);//海盗中心点
-                if(!this->inRange(getLength(p1,p2),spirit->getRange())){                 //如果不在攻击范围内了
-                    spirit->setTarget(NULL); //目标置为空
-                }
-                else{               //目标在攻击范围内
-                    spirit->addBullet();//一直增加子弹
-                }
-            }
-        }
-
-        //子弹移动
-        for(auto spirit:this->_spiritsVector){
+    QTimer* timer3=new QTimer(this);
+    timer3->start(50);
+    connect(timer3,&QTimer::timeout,[=](){
+        for(auto spirit:this->_spiritsVector){//界面所有精灵子弹移动
             spirit->fireBullets();
         }
+        for(auto pirate:this->_pirateVector){//界面所有海盗子弹移动
+            pirate->fireBullets();
+        }
+        this->addLifeEvent();
+    });
 
-        //判断击中
-        for(auto spirit:this->_spiritsVector){                 //遍历精灵
-            for(auto bullet=spirit->getBulletVector().begin();bullet<spirit->getBulletVector().end();bullet++){        //遍历该精灵的子弹
-                for(auto pirate=this->_pirateVector.begin();pirate<this->_pirateVector.end();pirate++){          //遍历海盗
-                    Point p1((*bullet)->getX(),(*bullet)->getY());   //子弹中心
-                    Point p2((*pirate)->getX(),(*pirate)->getY());   //海盗中心
-                    if(this->bingo(p1,p2)){                    //击中
-                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
-                        spirit->eraseBullet(bullet);                  //删去子弹
+    //一键显示所有精灵攻击范围按钮
+    QPushButton* displayAllSpiritRangePush = new QPushButton(this);
+    displayAllSpiritRangePush->setStyleSheet("color:black");
+    displayAllSpiritRangePush->setGeometry(10*PIX,1.25*PIX, 3*PIX, PIX/2);//位置
+    displayAllSpiritRangePush->setFont(QFont("宋体", 12,75));//字体，大小，粗细
+    displayAllSpiritRangePush->setText("精灵攻击范围");
 
-                        if((*pirate)->getLife()<=0){        //海盗没血了
-                            //判断一下其他精灵的目标怪物是否和当前精灵消灭的怪物重复，如果重复，则将那一个防御塔的目标怪物也设为空
-                            for (auto spirit2 : this->_spiritsVector){
-                                if (spirit2->getTarget() == *pirate){
-                                    spirit2->setTarget(NULL);
-                                }
-                            }
-                            this->_money += (*pirate)->getReward();//击败怪物增加金钱
-                            this->_moneyLabel->setText(QString("金钱：%1").arg(this->_money));//刷新标签
-                            this->_pirateVector.erase(pirate);               //删除怪物
+    connect(displayAllSpiritRangePush,&QPushButton::clicked,[=]()
+    {
+        this->_displayAllSpiritRange ? this->_displayAllSpiritRange = false : this->_displayAllSpiritRange = true;  //通过改变标识令防御塔攻击范围显示或关闭
+        update();
+    });
+
+    //一键显示所有海盗攻击范围按钮
+    QPushButton* displayAllPirateRangePush = new QPushButton(this);
+    displayAllPirateRangePush->setStyleSheet("color:black");
+    displayAllPirateRangePush->setGeometry(10*PIX,1.75*PIX, 3*PIX, PIX/2);//位置
+    displayAllPirateRangePush->setFont(QFont("宋体", 12,75));//字体，大小，粗细
+    displayAllPirateRangePush->setText("海盗攻击范围");
+
+    connect(displayAllPirateRangePush,&QPushButton::clicked,[=]()
+    {
+        this->_displayAllPirateRange ? this->_displayAllPirateRange = false : this->_displayAllPirateRange = true;  //通过改变标识令防御塔攻击范围显示或关闭
+        update();
+    });
+
+}
+
+//补血事件
+void MainWindow::addLifeEvent(){
+    this->_countLifeBlank++;
+    if(this->_countLifeBlank<this->_addLifeBlank){  //未达到时间间隔
+        return;
+    }
+    else{
+        for(auto spirit:this->_spiritsVector){
+            if(spirit->getType()==1){            //是萌布布种子
+                for(auto spirit2:this->_spiritsVector){
+                    Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);
+                    Point p2(spirit2->getX()+PIX/2,spirit2->getY()+PIX/2);
+                    if(getLength(p1,p2)<spirit->getRange()){                     //在范围内
+                        if(spirit2->getLife()+this->_addLife > spirit2->getFullLife()){
+                            spirit2->setLife(spirit2->getFullLife());                       //加血只能加到上限
                         }
-                        else{}
-                        break;
+                        else{
+                            spirit2->setLife(spirit2->getLife()+this->_addLife);//加血
+                        }
                     }
                     else continue;
                 }
             }
+            else continue;
         }
-        update();//画图
-    });
+        this->_countLifeBlank=0;//归零
+    }
+}
 
-    //一键显示所有精灵攻击范围按钮
-    QPushButton* displayAllRangePush = new QPushButton(this);
-    displayAllRangePush->setStyleSheet("color:black");
-    displayAllRangePush->setGeometry(10*PIX,1.25*PIX, 3*PIX, PIX/2);//位置
-    displayAllRangePush->setFont(QFont("宋体", 12,75));//字体，大小，粗细
-    displayAllRangePush->setText("显示全部攻击范围");
+//击中精灵事件
+void MainWindow::bingoSpiritEvent(){
+    for(auto pirate:this->_pirateVector){                 //遍历海盗
+        for(auto bullet=pirate->getBulletVector().begin();bullet<pirate->getBulletVector().end();bullet++){        //遍历该精灵的子弹
+            for(auto spirit=this->_spiritsVector.begin();spirit<this->_spiritsVector.end();spirit++){          //遍历精灵
+                Point p1((*bullet)->getX(),(*bullet)->getY());   //子弹中心
+                Point p2((*spirit)->getX()+PIX/2,(*spirit)->getY()+PIX/2);   //精灵中心
+                if(this->isBingo(p1,p2)){                    //击中
+                    (*spirit)->setLife((*spirit)->getLife()-(*bullet)->getAttack());//扣血
+                    pirate->eraseBullet(bullet);                  //删去子弹
 
-    connect(displayAllRangePush,&QPushButton::clicked,[=]()
-    {
-        this->_displayAllRange ? this->_displayAllRange = false : this->_displayAllRange = true;  //通过改变标识令防御塔攻击范围显示或关闭
-        update();
-    });
+                    if((*spirit)->getLife()<=0){        //精灵没血了
+                        Point p1((*spirit)->getX(),(*spirit)->getY());
+                        this->setCapsuleOccupied(p1,0);                  //解除精灵胶囊的占用
+                        this->_spiritsVector.erase(spirit);               //删除精灵
+                    }
+                    else{}
+                    break;
+                }
+                else continue;
+            }
+        }
+    }
+}
 
 
+//击中海盗事件
+void MainWindow::bingoPirateEvent(){
+    for(auto spirit:this->_spiritsVector){                 //遍历精灵
+        for(auto bullet=spirit->getBulletVector().begin();bullet<spirit->getBulletVector().end();bullet++){        //遍历该精灵的子弹
+            for(auto pirate=this->_pirateVector.begin();pirate<this->_pirateVector.end();pirate++){          //遍历海盗
+                Point p1((*bullet)->getX(),(*bullet)->getY());   //子弹中心
+                Point p2((*pirate)->getX()+PIX/2,(*pirate)->getY()+PIX/2);   //海盗中心
+                if(this->isBingo(p1,p2)){                    //击中
+                    (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                    spirit->eraseBullet(bullet);                  //删去子弹
+
+                    if((*pirate)->getLife()<=0){        //海盗没血了
+                        //判断一下其他精灵的目标怪物是否和当前精灵消灭的怪物重复，如果重复，则将那一个防御塔的目标怪物也设为空
+                        for (auto spirit2 : this->_spiritsVector){
+                            if (spirit2->getTarget() == *pirate){
+                                spirit2->setTarget(NULL);
+                            }
+                        }
+                        this->_money += (*pirate)->getReward();//击败怪物增加金钱
+                        this->_moneyLabel->setText(QString("金钱：%1").arg(this->_money));//刷新标签
+                        this->_pirateVector.erase(pirate);               //删除怪物
+                    }
+                    else{}
+                    break;
+                }
+                else continue;
+            }
+        }
+    }
+}
+
+//界面所有海盗找目标
+void MainWindow::allPirateFindTarget(){
+    //海盗寻找目标精灵的规律：找到最近的一个精灵作为目标
+    for (auto pirate : this->_pirateVector){       //遍历海盗
+        for(auto spirit: this->_spiritsVector){    //遍历精灵
+            //先判断在不在攻击范围内
+            Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);//精灵中心点
+            Point p2(pirate->getX()+PIX/2,pirate->getY()+PIX/2);//海盗中心点
+            if(this->inRange(getLength(p1,p2),pirate->getRange())){                 //如果在攻击范围内了
+                pirate->addBullet(p1);//增加一个子弹
+            }
+            else continue;
+        }
+
+    }
+}
+
+
+//界面所有精灵找目标
+void MainWindow::allSpiritsFindTarget(){
+    //精灵寻找目标海盗的规律：找到最前一个海盗作为目标，目标丢失后找再继续找下一个目标
+    for (auto spirit : this->_spiritsVector){       //遍历精灵
+        if(!spirit->getTarget()){                   //若当前没有目标海盗
+            for(int i = 0; i <=this->_pirateVector.size() - 1; i++){                 //遍历海盗
+                //这里以精灵中心点和怪物中心点判断
+                Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);
+                Point p2(this->_pirateVector.at(i)->getX()+PIX/2,this->_pirateVector.at(i)->getY()+PIX/2);
+                if (this->inRange(getLength(p1,p2),spirit->getRange())){             //如果在攻击范围内
+                    spirit->setTarget(this->_pirateVector.at(i));                    //设置精灵的目标怪物
+                    break;                                                           //找到后立刻跳出循环
+                }
+                else{}
+            }
+        }
+        else{                 //当前已经有了目标海盗
+            //先判断在不在攻击范围内
+            Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);//精灵中心点
+            Point p2(spirit->getTarget()->getX()+PIX/2,spirit->getTarget()->getY()+PIX/2);//海盗中心点
+            if(!this->inRange(getLength(p1,p2),spirit->getRange())){                 //如果不在攻击范围内了
+                spirit->setTarget(NULL); //目标置为空
+            }
+            else{               //目标在攻击范围内
+                spirit->addBullet();//一直增加子弹
+            }
+        }
+    }
+}
+
+//界面所有海盗的移动
+void MainWindow::allPiratesMove(){
+    for (auto pirate = this->_pirateVector.begin(); pirate != this->_pirateVector.end(); pirate++){
+        if((*pirate)->isEnd()){                   //海盗走到终点
+
+            //判断一下所有精灵的目标海盗是否和当前删除的海盗重复，如果重复，则将那一个精灵的目标海盗也设为空
+            for (auto spirit : this->_spiritsVector){
+                if (spirit->getTarget() == *pirate){
+                    spirit->setTarget(NULL);
+                }
+            }
+            delete *pirate;
+            this->_pirateVector.erase(pirate);         //海盗走到终点则删除这个海盗
+
+            this->_life--;//减生命
+            this->_lifeLabel->setText(QString("Life:%1").arg(this->_life));//刷新生命标签
+
+            if(this->_life<=0){
+                this->_loseLabel->show();
+                this->_theEnd=true;
+            }
+            else{}
+            break;
+        }
+        else{
+            (*pirate)->pirateMove();//海盗移动
+        }
+    }
 }
 
 //析构释放内存
@@ -224,6 +333,19 @@ void MainWindow::paintEvent(QPaintEvent *){
     DrawPirate(painter);//画出海盗
     DrawSpirits(painter);//画出精灵
     DrawSelectionBox(painter);//画选择框
+    DrawAddLife(painter);//加血特效
+}
+
+void MainWindow::DrawAddLife(QPainter &painter){
+    if(this->_countLifeBlank >= this->_addLifeBlank-2){
+        for(auto spirit:this->_spiritsVector){
+            if(spirit->getType()==1){
+                painter.setPen(QColor("lightgreen"));
+                painter.setBrush(QBrush(QColor("lightgreen"),Qt::Dense7Pattern));//填充颜色，透明度
+                painter.drawEllipse(QPoint(spirit->getX()+PIX/2, spirit->getY()+PIX/2), spirit->getRange(), spirit->getRange());
+            }
+        }
+    }
 }
 
 //画出地图，包括：精灵屋位置、基地位置
@@ -262,7 +384,6 @@ void MainWindow::addPirate(int pirateType, Point **path, int pathLength,Point& s
 
 void MainWindow::setPiratesWave(Point **path1, Point *entrance, int*pathLengths){
     Point** ways[]{path1};//储存不同的线路
-
     //加入海盗
     if(this->_count >= 1 && this->_count <= 10){
         addPirate(1,ways[0],pathLengths[0],entrance[0]); //海盗类型，路径，路径长度，起始点
@@ -283,21 +404,34 @@ void MainWindow::setPiratesWave(Point **path1, Point *entrance, int*pathLengths)
             this->_theEnd=true;
         }
     }
-
     this->_count++;          //计数器+1
     update();
 }
 
+//画海盗及其子弹
 void MainWindow::DrawPirate(QPainter &painter){
-    for(auto pirate: this->_pirateVector){
+    for(auto pirate: this->_pirateVector){//遍历海盗数组
+
+        if(this->_displayAllPirateRange){ //要显示所有海盗攻击范围
+            painter.setPen(QColor(pirate->getRangeColor()));//根据海盗的不同绘制不同颜色的攻击范围框
+            painter.setBrush(QBrush(QColor(pirate->getRangeColor()),Qt::Dense5Pattern));//填充颜色，透明度
+            painter.drawEllipse(QPoint(pirate->getX()+PIX/2, pirate->getY()+PIX/2), pirate->getRange(), pirate->getRange());
+        }
+
+
         painter.drawPixmap(pirate->getX(),pirate->getY(),PIX,PIX,QPixmap(pirate->getImagePath()));
+        //画出子弹
+        for(auto bullet:pirate->getBulletVector()){
+            painter.drawPixmap(bullet->getX()-PIX/4,bullet->getY()-PIX/4,PIX/2,PIX/2,QPixmap(bullet->getImagePath()));
+        }
     }
 }
 
+//画精灵及其子弹
 void MainWindow::DrawSpirits(QPainter &painter){
     for (auto spirit : this->_spiritsVector)  //遍历精灵数组
     {
-        if(this->_displayAllRange){ //要显示所有精灵攻击范围
+        if(this->_displayAllSpiritRange){ //要显示所有精灵攻击范围
             painter.setPen(QColor(spirit->getRangeColor()));//根据精灵的不同绘制不同颜色的攻击范围框
             painter.setBrush(QBrush(QColor(spirit->getRangeColor()),Qt::Dense5Pattern));//填充颜色，透明度
             painter.drawEllipse(QPoint(spirit->getX()+PIX/2, spirit->getY()+PIX/2), spirit->getRange(), spirit->getRange());
@@ -335,6 +469,7 @@ void MainWindow::DrawSelectionBox(QPainter &painter){
     }
 }
 
+//将鼠标点击转化为格子点击
 bool MainWindow::clickThisBlock(int mouseX, int mouseY, int blockX, int blockY){
     if(mouseX>=blockX && mouseX<=(blockX+PIX) && mouseY>=blockY &&mouseY<=(blockY+PIX)){
         return true;
@@ -352,7 +487,7 @@ void MainWindow::setCapsuleOccupied(const Point &p, const int k){
     }
 }
 
-
+//鼠标点击事件
 void MainWindow::mousePressEvent(QMouseEvent *ev){
     if(ev->button()!=Qt::LeftButton){
         return;                          //如果不是鼠标左键点击，则不做反应
@@ -369,17 +504,16 @@ void MainWindow::mousePressEvent(QMouseEvent *ev){
                 switch (i) {
                 case 0://萌布布种子
                 {
-                    if(this->canBuy(100)==true){    //够钱
+                    if(this->canBuy(100)){    //够钱
                         this->_spiritsVector.push_back(new MengBuBuZhongZi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
                         Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
                         this->setCapsuleOccupied(p1,1);
                     }
-
                     break;
                 }
                 case 1://萌火猴
                 {
-                    if(this->canBuy(100)==true){    //够钱
+                    if(this->canBuy(100)){    //够钱
                         this->_spiritsVector.push_back(new MengHuoHou(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
                         Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
                         this->setCapsuleOccupied(p1,2);
@@ -388,12 +522,11 @@ void MainWindow::mousePressEvent(QMouseEvent *ev){
                 }
                 case 2://萌伊尤
                 {
-                    if(this->canBuy(100)==true){    //够钱
+                    if(this->canBuy(100)){    //够钱
                         this->_spiritsVector.push_back(new MengYiYou(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
                         Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
                         this->setCapsuleOccupied(p1,3);
                     }
-
                     break;
                 }
                 default:break;
@@ -405,8 +538,7 @@ void MainWindow::mousePressEvent(QMouseEvent *ev){
         }
 
         //判断塔坑的点击
-        //遍历所有塔坑
-        for(auto capsule:this->_capsuleVector){
+        for(auto capsule:this->_capsuleVector){        //遍历所有塔坑
             //判断点击塔坑
             if(clickThisBlock(ev->x(),ev->y(),capsule->getX(),capsule->getY())){  //选到了一个塔坑
                 switch (capsule->getOccupied()) {
@@ -417,13 +549,11 @@ void MainWindow::mousePressEvent(QMouseEvent *ev){
                 }
                 default:break;
                 }
-
                 update();//更新
                 return;
             }
             else continue;
         }
-
         this->_bag->setDisplay(false);//关闭选择框
         update();//更新
     }
@@ -445,8 +575,8 @@ bool MainWindow::inRange(int distance, int range){
     else return false;
 }
 
-bool MainWindow::bingo(Point &bulletP, Point &pirateP){
-    if(getLength(bulletP,pirateP)<1*PIX){
+bool MainWindow::isBingo(Point &bulletP, Point &targetP){
+    if(getLength(bulletP,targetP)<1*PIX){
         return true;
     }
     else return false;
