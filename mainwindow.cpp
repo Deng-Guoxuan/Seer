@@ -182,16 +182,42 @@ void MainWindow::bingoSpiritEvent(){
 }
 
 
+
+
 //击中海盗事件
 void MainWindow::bingoPirateEvent(){
+    for(auto splash=this->_splashedPoint.begin();splash<this->_splashedPoint.end();splash++){
+        this->_splashedPoint.erase(splash);//先清空溅伤点
+    }
     for(auto spirit:this->_spiritsVector){                 //遍历精灵
         for(auto bullet=spirit->getBulletVector().begin();bullet<spirit->getBulletVector().end();bullet++){        //遍历该精灵的子弹
             for(auto pirate=this->_pirateVector.begin();pirate<this->_pirateVector.end();pirate++){          //遍历海盗
                 Point p1((*bullet)->getX(),(*bullet)->getY());   //子弹中心
                 Point p2((*pirate)->getX()+PIX/2,(*pirate)->getY()+PIX/2);   //海盗中心
                 if(this->isBingo(p1,p2)){                    //击中
-                    (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
-                    spirit->eraseBullet(bullet);                  //删去子弹
+                    switch ((*bullet)->getType()) {               //根据子弹类型触发不同效果
+                    case 1://绿子弹：无其他效果,碰到目标即消失
+                    {
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        spirit->eraseBullet(bullet);
+                        break;
+                    }
+                    case 2://红子弹：范围溅伤效果,碰到目标即消失
+                    {
+                        redBulletEffect(p2,(*bullet)->getAttack());
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        spirit->eraseBullet(bullet);
+                        break;
+                    }
+                    case 3://蓝子弹：范围减速效果,碰到目标即消失
+                    {
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        spirit->eraseBullet(bullet);
+                        break;
+                    }
+                    default:
+                        break;
+                    }
 
                     if((*pirate)->getLife()<=0){        //海盗没血了
                         //判断一下其他精灵的目标怪物是否和当前精灵消灭的怪物重复，如果重复，则将那一个防御塔的目标怪物也设为空
@@ -291,6 +317,17 @@ void MainWindow::allPiratesMove(){
     }
 }
 
+//萌火猴的红子弹范围溅伤效果：传入当前命中目标的中心点,以及该子弹的攻击力(溅伤四分之一的攻击力)
+void MainWindow::redBulletEffect(Point &p,int damage){
+    for(auto pirate:this->_pirateVector){        //遍历海盗
+        Point p2(pirate->getX()+PIX/2,pirate->getY()+PIX/2);//海盗中心点
+        if(getLength(p,p2)<=80 && getLength(p,p2)>0){      //80范围内的海盗被溅伤
+            this->_splashedPoint.push_back(new Point(p2));//加入一个要画出溅伤的点
+            pirate->setLife(pirate->getLife()-damage/4);   //溅伤扣血
+        }
+    }
+}
+
 //析构释放内存
 MainWindow::~MainWindow()
 {
@@ -322,6 +359,12 @@ MainWindow::~MainWindow()
         *it=NULL;
     }
 
+    //释放溅伤点数组
+    for(auto it = this->_splashedPoint.begin(); it != this->_splashedPoint.end(); it++){
+        delete *it;
+        *it=NULL;
+    }
+
     delete ui;
 }
 
@@ -334,6 +377,14 @@ void MainWindow::paintEvent(QPaintEvent *){
     DrawSpirits(painter);//画出精灵
     DrawSelectionBox(painter);//画选择框
     DrawAddLife(painter);//加血特效
+    DrawSplash(painter);//溅伤特效
+
+}
+
+void MainWindow::DrawSplash(QPainter &painter){
+    for(auto point:this->_splashedPoint){
+        painter.drawPixmap(point->getX()-PIX/2,point->getY()+PIX/4,PIX,PIX/4,QPixmap(":/Image/pictures/splashed.png"));
+    }
 }
 
 void MainWindow::DrawAddLife(QPainter &painter){

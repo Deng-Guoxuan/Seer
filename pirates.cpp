@@ -38,6 +38,14 @@ Pirates::Pirates(Point **path, int pathLength, Point &p, int id):
     }
 }
 
+void Pirates::setSplashed(const bool tf){
+    this->_isSplashed=tf;
+}
+
+bool Pirates::getSplashed()const{
+    return this->_isSplashed;
+}
+
 //取得速度
 int Pirates::getSpeed()const{
     return this->_speed;

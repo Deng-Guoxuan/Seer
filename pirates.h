@@ -30,6 +30,8 @@ public:
     void addBullet(Point &targetP); //新建子弹
     void fireBullets();//管理该精灵所有子弹的移动
     void eraseBullet(Bullet** i);//删除第i个子弹
+    void setSplashed(const bool tf);//设置是否溅伤
+    bool getSplashed()const;
 
     int getFireBlank()const;//攻击间隔
     QString getRangeColor()const;
@@ -47,6 +49,7 @@ protected:
     int _id;//海盗类型
     int _reward;//金钱奖励
     QString _rangeColor;
+    bool _isSplashed=false;//判断是否被溅伤,是的话画图
 
     QVector<Bullet*> _bulletVector;//子弹数组
 
