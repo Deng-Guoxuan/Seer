@@ -10,10 +10,13 @@ public:
     SelectionBox(QString imagePath);//构造
     int getX()const;//获取横坐标
     int getY()const;//获取横坐标
-    QString getImgPath()const; //获取选择框图片路径
+
     bool getDisplay()const;//获取显示状态
+
     void setDisplay(const bool tf); //设置显示状态
     void clickOne(int x, int y);//选中一个位置
+
+    QString getImgPath()const; //获取选择框图片路径
     SubButton* getSubButtons();//获取子按钮结构数组
 
 private:

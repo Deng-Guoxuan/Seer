@@ -17,5 +17,7 @@
         <file>pictures/YingKaLuoSi.png</file>
         <file>pictures/blackBullet.png</file>
         <file>pictures/splashed.png</file>
+        <file>pictures/redBar.png</file>
+        <file>pictures/whiteBar.png</file>
     </qresource>
 </RCC>

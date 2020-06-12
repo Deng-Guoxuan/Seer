@@ -14,6 +14,7 @@ Pirates::Pirates(Point **path, int pathLength, Point &p, int id):
     switch (id) {
     case 1:                        //pirate1
         this->_life=100;
+        this->_fullLife=100;
         this->_speed=6;
         this->_imagePath=":/Image/pictures/pirate1.png";
         this->_reward=20;
@@ -25,6 +26,7 @@ Pirates::Pirates(Point **path, int pathLength, Point &p, int id):
         break;
     case 2:
         this->_life=120;
+        this->_fullLife=120;
         this->_speed=12;
         this->_imagePath=":/Image/pictures/pirate2.png";
         this->_reward=40;
@@ -36,6 +38,10 @@ Pirates::Pirates(Point **path, int pathLength, Point &p, int id):
     default:
         break;
     }
+}
+
+int Pirates::getFullLife()const{
+    return this->_fullLife;
 }
 
 void Pirates::setSplashed(const bool tf){

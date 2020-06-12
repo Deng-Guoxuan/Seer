@@ -13,15 +13,16 @@ public:
     int getX()const;
     int getY()const;
     int getSpeed()const;
-    void setX(const int x);
-    void setY(const int y);
-    QString getImagePath()const;
-    void bulletMove();//子弹移动
     int getType()const;
-    void setType(const int type);
     int getL()const;//方向向量的模长
     int getAttack()const;
 
+    void setX(const int x);
+    void setY(const int y);
+    void bulletMove();//子弹移动
+    void setType(const int type);
+
+    QString getImagePath()const;
 
 protected:
     int _type;//子弹类型

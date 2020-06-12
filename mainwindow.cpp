@@ -96,6 +96,11 @@ MainWindow::MainWindow(QWidget *parent) :
         for(auto pirate:this->_pirateVector){//界面所有海盗子弹移动
             pirate->fireBullets();
         }
+    });
+
+    QTimer* timer4=new QTimer(this);
+    timer4->start(1000);//1秒刷新一次
+    connect(timer4,&QTimer::timeout,[=](){
         this->addLifeEvent();
     });
 
@@ -122,6 +127,32 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(displayAllPirateRangePush,&QPushButton::clicked,[=]()
     {
         this->_displayAllPirateRange ? this->_displayAllPirateRange = false : this->_displayAllPirateRange = true;  //通过改变标识令防御塔攻击范围显示或关闭
+        update();
+    });
+
+    //一键显示所有海盗血量按钮
+    QPushButton* displayAllPirateLifePush = new QPushButton(this);
+    displayAllPirateLifePush->setStyleSheet("color:darkred");
+    displayAllPirateLifePush->setGeometry(13*PIX,1.75*PIX, 2*PIX, PIX/2);//位置
+    displayAllPirateLifePush->setFont(QFont("宋体", 12,75));//字体，大小，粗细
+    displayAllPirateLifePush->setText("海盗血量");
+
+    connect(displayAllPirateLifePush,&QPushButton::clicked,[=]()
+    {
+        this->_displayPirateLifeBar ? this->_displayPirateLifeBar = false : this->_displayPirateLifeBar = true;  //通过改变标识令防御塔攻击范围显示或关闭
+        update();
+    });
+
+    //一键显示所有精灵血量按钮
+    QPushButton* displayAllSpiritLifePush = new QPushButton(this);
+    displayAllSpiritLifePush->setStyleSheet("color:darkred");
+    displayAllSpiritLifePush->setGeometry(13*PIX,1.25*PIX, 2*PIX, PIX/2);//位置
+    displayAllSpiritLifePush->setFont(QFont("宋体", 12,75));//字体，大小，粗细
+    displayAllSpiritLifePush->setText("精灵血量");
+
+    connect(displayAllSpiritLifePush,&QPushButton::clicked,[=]()
+    {
+        this->_displaySpiritLifeBar ? this->_displaySpiritLifeBar = false : this->_displaySpiritLifeBar = true;  //通过改变标识令防御塔攻击范围显示或关闭
         update();
     });
 
@@ -252,7 +283,6 @@ void MainWindow::allPirateFindTarget(){
             }
             else continue;
         }
-
     }
 }
 
@@ -378,7 +408,35 @@ void MainWindow::paintEvent(QPaintEvent *){
     DrawSelectionBox(painter);//画选择框
     DrawAddLife(painter);//加血特效
     DrawSplash(painter);//溅伤特效
+    DrawSpiritLifeBar(painter);//精灵血条
+    DrawPirateLifeBar(painter);//海盗血条
 
+}
+
+void MainWindow::DrawSpiritLifeBar(QPainter &painter){
+    if(this->_displaySpiritLifeBar){
+        for(auto spirit:this->_spiritsVector){
+            int lifeLength=spirit->getLife()*(PIX-8)/spirit->getFullLife();//剩余血量
+            painter.drawPixmap(spirit->getX()+4,spirit->getY()-PIX/4,lifeLength,PIX/8,QPixmap(":/Image/pictures/redBar.png"));
+            painter.drawPixmap(spirit->getX()+lifeLength,spirit->getY()-PIX/4,PIX-8-lifeLength,PIX/8,QPixmap(":/Image/pictures/whiteBar.png"));
+            painter.setPen(QPen(Qt::yellow, 1, Qt::SolidLine));//设置画笔，黄色，实线
+            painter.drawRect(QRect(spirit->getX()+4,spirit->getY()-PIX/4,PIX-8,PIX/8));//将选中区域用黄色实线框起来
+        }
+    }
+    else return;
+}
+
+void MainWindow::DrawPirateLifeBar(QPainter &painter){
+    if(this->_displayPirateLifeBar){
+        for(auto pirate:this->_pirateVector){
+            int lifeLength=pirate->getLife()*(PIX-8)/pirate->getFullLife();//剩余血量
+            painter.drawPixmap(pirate->getX()+4,pirate->getY()-PIX/4,lifeLength,PIX/8,QPixmap(":/Image/pictures/redBar.png"));
+            painter.drawPixmap(pirate->getX()+lifeLength,pirate->getY()-PIX/4,PIX-8-lifeLength,PIX/8,QPixmap(":/Image/pictures/whiteBar.png"));
+            painter.setPen(QPen(Qt::yellow, 1, Qt::SolidLine));//设置画笔，黄色，实线
+            painter.drawRect(QRect(pirate->getX()+4,pirate->getY()-PIX/4,PIX-8,PIX/8));//将选中区域用黄色实线框起来
+        }
+    }
+    else return;
 }
 
 void MainWindow::DrawSplash(QPainter &painter){
@@ -388,7 +446,7 @@ void MainWindow::DrawSplash(QPainter &painter){
 }
 
 void MainWindow::DrawAddLife(QPainter &painter){
-    if(this->_countLifeBlank >= this->_addLifeBlank-2){
+    if(this->_countLifeBlank >= this->_addLifeBlank-1){
         for(auto spirit:this->_spiritsVector){
             if(spirit->getType()==1){
                 painter.setPen(QColor("lightgreen"));
