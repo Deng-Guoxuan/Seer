@@ -231,10 +231,5 @@ void Pirates::fireBullets(){
 }
 
 void Pirates::eraseBullet(Bullet **bullet){
-//    for(auto bullet=this->_bulletVector.begin();bullet<this->_bulletVector.end();bullet++){
-//        if(bullet==i){
-            this->_bulletVector.erase(bullet);
-//        }
-//        else continue;
-//    }
+    this->_bulletVector.erase(bullet);
 }
