@@ -29,7 +29,7 @@ public:
     void pirateMove();//一个海盗移动
     void addBullet(Point &targetP); //新建子弹
     void fireBullets();//管理该精灵所有子弹的移动
-    void eraseBullet(Bullet** i);//删除第i个子弹
+    void eraseBullet(Bullet** bullet);//删除第i个子弹
     void setSplashed(const bool tf);//设置是否溅伤
     void setSpeed(const int speed);//设置速度
     void setWaved(const bool tf);

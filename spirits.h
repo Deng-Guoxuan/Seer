@@ -23,9 +23,8 @@ public:
     void setTarget(Pirates* target);//设置当前精灵的目标怪物
     void addBullet(); //新建子弹
     void fireBullets();//管理该精灵所有子弹的移动
-    void eraseBullet(Bullet** i);//删除第i个子弹
+    void eraseBullet(Bullet** bullet);//删除第i个子弹
     void setLife(const int life);
-    void addLife(QVector<Spirits*>&spiritsVector);//只有萌布布种子才构造了这个函数
 
     QString getImagePath()const;//获得图片路径
     QString getRangeColor()const;//获得攻击范围的颜色

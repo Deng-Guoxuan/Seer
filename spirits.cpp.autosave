@@ -100,12 +100,7 @@ int Spirits::getFullLife()const{
 }
 
 void Spirits::eraseBullet(Bullet **bullet){
-//    for(auto bullet=this->_bulletVector.begin();bullet<this->_bulletVector.end();bullet++){
-//        if(bullet==bullet){
-            this->_bulletVector.erase(bullet);
-//        }
-//        else continue;
-//    }
+    this->_bulletVector.erase(bullet);
 }
 
 int Spirits::getLife()const{
