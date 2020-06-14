@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2020-05-25T21:55:53
+# Project created by QtCreator 2020-06-13T10:53:21
 #
 #-------------------------------------------------
 
@@ -9,7 +9,7 @@ QT       += multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = Seer
+TARGET = Seer3
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -27,37 +27,39 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+    bullet.cpp \
+    point.cpp \
     spirits.cpp \
     pirates.cpp \
-    mengbubuzhongzi.cpp \
-    selectionbox.cpp \
-    point.cpp \
-    subbutton.cpp \
-    bullet.cpp \
-    greenbullet.cpp \
-    menghuohou.cpp \
-    redbullet.cpp \
-    mengyiyou.cpp \
+    blackbullet.cpp \
     bluebullet.cpp \
     capsule.cpp \
-    blackbullet.cpp
+    greenbullet.cpp \
+    mengbubuzhongzi.cpp \
+    menghuohou.cpp \
+    mengyiyou.cpp \
+    redbullet.cpp \
+    selectionbox.cpp \
+    subbutton.cpp \
+    world1.cpp
 
 HEADERS += \
         mainwindow.h \
+    bullet.h \
+    point.h \
     spirits.h \
     pirates.h \
-    mengbubuzhongzi.h \
-    selectionbox.h \
-    point.h \
-    subbutton.h \
-    bullet.h \
-    greenbullet.h \
-    menghuohou.h \
-    redbullet.h \
-    mengyiyou.h \
+    blackbullet.h \
     bluebullet.h \
     capsule.h \
-    blackbullet.h
+    greenbullet.h \
+    mengbubuzhongzi.h \
+    menghuohou.h \
+    mengyiyou.h \
+    redbullet.h \
+    selectionbox.h \
+    subbutton.h \
+    world1.h
 
 FORMS += \
         mainwindow.ui
@@ -66,5 +68,4 @@ RESOURCES += \
     pics.qrc \
     snds.qrc
 
-DISTFILES +=
 

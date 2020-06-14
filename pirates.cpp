@@ -4,7 +4,7 @@
 const int PIX=64;
 
 Pirates::Pirates(Point **path, int pathLength, Point &p, int id):
-    _p(p.getX(),p.getY()),_id(id)
+    _id(id), _p(p.getX(),p.getY())
 {
     for(int i=0;i<pathLength;i++){
         this->_turningPoints.push_back(path[i]);//将转折点插入动态数组中
@@ -16,6 +16,7 @@ Pirates::Pirates(Point **path, int pathLength, Point &p, int id):
         this->_life=100;
         this->_fullLife=100;
         this->_speed=6;
+        this->_fullSpeed=6;
         this->_imagePath=":/Image/pictures/pirate1.png";
         this->_reward=20;
         this->_type=1;
@@ -28,6 +29,7 @@ Pirates::Pirates(Point **path, int pathLength, Point &p, int id):
         this->_life=120;
         this->_fullLife=120;
         this->_speed=12;
+        this->_fullSpeed=12;
         this->_imagePath=":/Image/pictures/pirate2.png";
         this->_reward=40;
         this->_type=2;
@@ -55,6 +57,18 @@ bool Pirates::getSplashed()const{
 //取得速度
 int Pirates::getSpeed()const{
     return this->_speed;
+}
+
+int Pirates::getFullSpeed()const{
+    return this->_fullSpeed;
+}
+
+void Pirates::setWaved(const bool tf){
+    this->_isWaved=tf;
+}
+
+bool Pirates::getWaved()const{
+    return this->_isWaved;
 }
 
 //左上角x坐标
@@ -98,7 +112,19 @@ bool Pirates::isEnd(){
 void Pirates::pirateMove()
 {
     if(this->_turningPoints.empty()){
-        return;                      //到达了终点,true
+        return;                      //到达了终点
+    }
+
+    if(this->_isWaved){
+        this->_norSpdBlank=0;       //开始计算减速时间
+        this->_isWaved=false;
+    }
+
+    if(this->_norSpdBlank==50){           //到时间恢复原速度
+        this->_speed=this->_fullSpeed;
+    }
+    else{
+        this->_norSpdBlank++;
     }
 
     //如果第一个路径点的y小于海盗原本的路径点，则海盗向下走
@@ -134,6 +160,10 @@ void Pirates::pirateMove()
     }
 
     return;
+}
+
+void Pirates::setSpeed(const int speed){
+    this->_speed=speed;
 }
 
 int Pirates::getReward()const{

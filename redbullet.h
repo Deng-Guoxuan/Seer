@@ -6,7 +6,7 @@
 class RedBullet : public Bullet
 {
 public:
-    RedBullet(Point&startPoint,Point&targetPoint);
+    RedBullet(Point&startPoint, Point&targetPoint);
 };
 
 #endif // REDBULLET_H

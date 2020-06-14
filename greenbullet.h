@@ -6,7 +6,7 @@
 class GreenBullet : public Bullet
 {
 public:
-    GreenBullet(Point&startPoint,Point&targetPoint);
+    GreenBullet(Point&startPoint, Point&targetPoint);
 };
 
 #endif // GREENBULLET_H

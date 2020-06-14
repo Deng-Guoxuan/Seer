@@ -6,7 +6,7 @@
 class BlackBullet : public Bullet
 {
 public:
-    BlackBullet(Point&startPoint,Point&targetPoint);
+    BlackBullet(Point&startPoint, Point&targetPoint);
 };
 
 #endif // BLACKBULLET_H

@@ -1,23 +1,27 @@
 <RCC>
     <qresource prefix="/Image">
-        <file>pictures/MengBuBuZhongZi.png</file>
-        <file>pictures/pirate1.png</file>
-        <file>pictures/Capsule.png</file>
-        <file>pictures/base.png</file>
-        <file>pictures/Map1.png</file>
-        <file>pictures/pirate2.png</file>
         <file>pictures/bag.png</file>
-        <file>pictures/greenBullet.png</file>
+        <file>pictures/base.png</file>
+        <file>pictures/blackBullet.png</file>
         <file>pictures/blueBullet.png</file>
+        <file>pictures/Capsule.png</file>
+        <file>pictures/greenBullet.png</file>
+        <file>pictures/LeiYi.png</file>
+        <file>pictures/login.png</file>
+        <file>pictures/login1.png</file>
+        <file>pictures/Map1.png</file>
+        <file>pictures/MengBuBuZhongZi.png</file>
         <file>pictures/MengHuoHou.png</file>
         <file>pictures/MengYiYou.png</file>
-        <file>pictures/redBullet.png</file>
-        <file>pictures/LeiYi.png</file>
+        <file>pictures/pirate1.png</file>
+        <file>pictures/pirate2.png</file>
         <file>pictures/PuNi.png</file>
-        <file>pictures/YingKaLuoSi.png</file>
-        <file>pictures/blackBullet.png</file>
-        <file>pictures/splashed.png</file>
         <file>pictures/redBar.png</file>
+        <file>pictures/redBullet.png</file>
+        <file>pictures/splashed.png</file>
         <file>pictures/whiteBar.png</file>
+        <file>pictures/YingKaLuoSi.png</file>
+        <file>pictures/wave.png</file>
+        <file>pictures/login2.png</file>
     </qresource>
 </RCC>

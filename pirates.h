@@ -23,6 +23,7 @@ public:
     int getFireBlank()const;//攻击间隔
     int getRange()const;
     int getFullLife()const;
+    int getFullSpeed()const;
 
     void setLife(const int life);//设置血量
     void pirateMove();//一个海盗移动
@@ -30,9 +31,12 @@ public:
     void fireBullets();//管理该精灵所有子弹的移动
     void eraseBullet(Bullet** i);//删除第i个子弹
     void setSplashed(const bool tf);//设置是否溅伤
+    void setSpeed(const int speed);//设置速度
+    void setWaved(const bool tf);
 
     bool isEnd();//判断是不是到终点了
     bool getSplashed()const;
+    bool getWaved()const;
 
 
     QString getImagePath()const;//取得图片路径
@@ -42,7 +46,9 @@ public:
 
 protected:
     int _type;//海盗种类
-    int _speed;//移动速度
+    int _speed;//移动速度(会变)
+    int _fullSpeed;//满速
+    int _norSpdBlank=50;
     int _range;//攻击范围
     int _fireBlank;//攻击间隔
     int _countBlank=0;//时刻变化调整计算间隔
@@ -52,6 +58,7 @@ protected:
     int _reward;//金钱奖励
 
     bool _isSplashed=false;//判断是否被溅伤,是的话画图
+    bool _isWaved=false;//判断是否被减速
 
     Point _p;//左上角坐标
 
