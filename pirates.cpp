@@ -1,44 +1,14 @@
 #include "pirates.h"
 #include "blackbullet.h"
+#include "brownbullet.h"
 
 const int PIX=64;
 
-Pirates::Pirates(Point **path, int pathLength, Point &p, int id):
-    _id(id), _p(p.getX(),p.getY())
+Pirates::Pirates(Point **path, int pathLength, Point &p):
+     _p(p.getX(),p.getY())
 {
     for(int i=0;i<pathLength;i++){
         this->_turningPoints.push_back(path[i]);//将转折点插入动态数组中
-    }
-
-    //根据id类型对海盗进行初始化
-    switch (id) {
-    case 1:                        //pirate1
-        this->_life=100;
-        this->_fullLife=100;
-        this->_speed=6;
-        this->_fullSpeed=6;
-        this->_imagePath=":/Image/pictures/pirate1.png";
-        this->_reward=20;
-        this->_type=1;
-        this->_range=100;
-        this->_fireBlank=15;
-        this->_countBlank=15;
-        this->_rangeColor="black";
-        break;
-    case 2:
-        this->_life=120;
-        this->_fullLife=120;
-        this->_speed=12;
-        this->_fullSpeed=12;
-        this->_imagePath=":/Image/pictures/pirate2.png";
-        this->_reward=40;
-        this->_type=2;
-        this->_range=100;
-        this->_fireBlank=10;
-        this->_countBlank=10;
-        this->_rangeColor="black";
-    default:
-        break;
     }
 }
 
@@ -108,6 +78,14 @@ bool Pirates::isEnd(){
     else return false;
 }
 
+void Pirates::setShocked(const bool tf){
+    this->_shocked=tf;
+}
+
+bool Pirates::getShocked()const{
+    return this->_shocked;
+}
+
 //海盗按设定路径点移动
 void Pirates::pirateMove()
 {
@@ -118,6 +96,11 @@ void Pirates::pirateMove()
     if(this->_isWaved){
         this->_norSpdBlank=0;       //开始计算减速时间
         this->_isWaved=false;
+    }
+
+    if(this->_shocked){
+        this->_norSpdBlank=0;
+        this->_shocked=false;
     }
 
     if(this->_norSpdBlank==50){           //到时间恢复原速度
@@ -187,6 +170,10 @@ QVector<Bullet*>& Pirates::getBulletVector(){
     return this->_bulletVector;
 }
 
+void Pirates::setCountBlank(const int t){
+    this->_countBlank=t;
+}
+
 //输入一个精灵的中心点
 void Pirates::addBullet(Point&targetP){
     this->_countBlank++;
@@ -196,7 +183,7 @@ void Pirates::addBullet(Point&targetP){
     }
     else{
         Point p1(this->getX()+PIX/2,this->getY()+PIX/2);//海盗的中心点
-        switch (this->_type){
+        switch (this->_id){
         case 1:                   //pirate1:黑灰子弹
         {
             this->_bulletVector.push_back(new BlackBullet(p1,targetP));
@@ -205,6 +192,11 @@ void Pirates::addBullet(Point&targetP){
         case 2:                   //pirate2:黑灰子弹
         {
             this->_bulletVector.push_back(new BlackBullet(p1,targetP));
+            break;
+        }
+        case 3:
+        {
+            this->_bulletVector.push_back(new BrownBullet(p1,targetP));
             break;
         }
         default:

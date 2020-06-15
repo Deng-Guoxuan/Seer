@@ -23,5 +23,16 @@
         <file>pictures/YingKaLuoSi.png</file>
         <file>pictures/wave.png</file>
         <file>pictures/login2.png</file>
+        <file>pictures/logo.png</file>
+        <file>pictures/startform.png</file>
+        <file>pictures/pirate3.png</file>
+        <file>pictures/pirate4.png</file>
+        <file>pictures/pirate5.png</file>
+        <file>pictures/pirate6.png</file>
+        <file>pictures/pirate7.png</file>
+        <file>pictures/pirate8.png</file>
+        <file>pictures/brownBullet.png</file>
+        <file>pictures/lightingBullet.png</file>
+        <file>pictures/lighting.png</file>
     </qresource>
 </RCC>

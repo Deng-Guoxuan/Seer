@@ -2,6 +2,7 @@
 #include "greenbullet.h"
 #include "redbullet.h"
 #include "bluebullet.h"
+#include "lightingbullet.h"
 
 const int PIX=64;//一格的像素
 
@@ -47,6 +48,45 @@ QVector<Bullet*>& Spirits::getBulletVector(){
     return this->_bulletVector;
 }
 
+int Spirits::getCountLifeBlank()const{
+    return this->_countLifeBlank;
+}
+
+int Spirits::getAddLifeBlank()const{
+    return this->_addLifeBlank;
+}
+
+void Spirits::addLife(QVector<Spirits *> &spiritsVector){
+    this->_countLifeBlank++;
+
+    if(this->_countLifeBlank<this->_addLifeBlank){ //没到时间不能补血
+        return;
+    }
+    else if(this->_type==1){                     //这是萌布布种子,有补血技能
+        for(auto spirit:spiritsVector){
+            Point p1(this->getX()+PIX/2,this->getY()+PIX/2);
+            Point p2(spirit->getX()+PIX/2,spirit->getY()+PIX/2);
+            if(getLength(p1,p2)<=this->getRange()){                    //在范围内
+                if(spirit->getLife()+this->_addLife > spirit->getFullLife()){
+                    spirit->setLife(spirit->getFullLife());                       //加血只能加到上限
+                }
+                else{
+                    spirit->setLife(spirit->getLife()+this->_addLife);//加血
+                }
+            }
+        }
+    }
+    else{               //只是普通精灵,只能给自己加血
+        if(this->getLife()+this->_addLife > this->getFullLife()){
+            this->setLife(this->getFullLife());                       //加血只能加到上限
+        }
+        else{
+            this->setLife(this->getLife()+this->_addLife);//加血
+        }
+    }
+    this->_countLifeBlank=0;//归零
+}
+
 void Spirits::addBullet(){
     this->_countBlank++;
 
@@ -70,6 +110,11 @@ void Spirits::addBullet(){
         case 3:
         {
             this->_bulletVector.push_back(new BlueBullet(p1,p2));
+            break;
+        }
+        case 4:
+        {
+            this->_bulletVector.push_back(new LightingBullet(p1,p2));
             break;
         }
         default:

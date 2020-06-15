@@ -27,9 +27,8 @@ private:
     int _count=0;//计算海盗的数量，决定出现新的海盗以及游戏结束
     int _money=200;//初始钱数
     int _life=5;//基地生命值
-    int _addLife=20;//精灵每次加20血
-    int _addLifeBlank=3;//精灵加血的间隔：3秒
-    int _countLifeBlank=0;//随时变化计算加血间隔时间
+
+
     int _pirateBlank=3000;//插入海盗的间隔时间,根据海盗难度调整
 
     bool _displayAllSpiritRange=false;//一键显示所有精灵攻击范围
@@ -55,6 +54,7 @@ private:
     int getPirateBlank()const;
 
     void DrawMap1(QPainter& painter);//画出地图Map1
+    void setMap1();//设置地图
     void DrawPirate(QPainter& painter);//画出海盗
     void DrawSpirits(QPainter& painter);//画出精灵
     void DrawSelectionBox(QPainter& painter);//画出选择框
@@ -63,7 +63,8 @@ private:
     void DrawWave(QPainter& painter);//海浪特效
     void DrawSpiritLifeBar(QPainter& painter);//精灵血条
     void DrawPirateLifeBar(QPainter& painter);//海盗血条
-    void setPiratesWave(Point **path1, Point *entrance, int* pathLengths);//设置每波海盗的形式
+    void DrawLighting(QPainter& painter);//雷电特效
+    void setPiratesWave(Point **path1, Point **path2, Point *entrance, int* pathLengths);//设置每波海盗的形式
     void setCapsuleOccupied(const Point&p,const int k);//标记已有精灵的胶囊
     void setPirateBlank(const int blank);
     void addPirate(int pirateType, Point** path, int pathLength, Point &startPoint);//增加一个海盗
@@ -72,7 +73,7 @@ private:
     void bingoPirateEvent();//击中海盗后要如何处理
     void allPirateFindTarget();//控制界面所有海盗找目标
     void bingoSpiritEvent();//击中精灵后如何处理
-    void addLifeEvent();//萌布布种子的加血技能事件
+    void addLifeEvent();//精灵的加血技能事件
     void redBulletEffect(Point& p, int damage);//萌火猴的红子弹范围溅伤效果,溅伤精灵攻击力的四分之一
     void blueBulletEffect(Point& p, double percentage);//萌伊尤的蓝子弹范围减速效果,(按比例减少)
 

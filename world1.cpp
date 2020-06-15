@@ -6,6 +6,10 @@
 #include "windows.h"
 #include "menghuohou.h"
 #include "mengyiyou.h"
+#include "leiyi.h"
+#include "pirate1.h"
+#include "pirate2.h"
+#include "pirate3.h"
 
 const int PIX=64;//一格64像素
 
@@ -13,6 +17,8 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
 {
     setFixedSize(1152,640);//设置窗口大小
     setWindowTitle("Seer");//设置窗口名称
+
+    setMap1();//设定地图
 
     this->_moneyLabel->setGeometry(10*PIX,0.75*PIX,3*PIX,PIX/2);//位置
     this->_moneyLabel->setFont(QFont("微软雅黑",12,75));//字体，大小，粗细
@@ -56,13 +62,22 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
                         new Point(1*PIX,4*PIX),new Point(2*PIX,4*PIX),new Point(2*PIX,3*PIX),new Point(3*PIX,3*PIX),
                         new Point(this->_base)
                        };//最后的路径点设为家
-        Point entrance[]={Point(6*PIX, 5*PIX)};//入口位置
-        int pathLengths[]={sizeof(path1)/sizeof(Point*)};//路径的结点个数
-        setPiratesWave(path1, entrance, pathLengths);   //使用预设的1条路产生怪物方案
+
+        Point* path2[]={new Point(6*PIX,6*PIX),new Point(8*PIX,6*PIX),new Point(8*PIX,5*PIX),new Point(10*PIX,5*PIX),
+                        new Point(10*PIX,8*PIX),new Point(7*PIX,8*PIX),new Point(7*PIX,9*PIX),new Point(5*PIX,9*PIX),
+                        new Point(5*PIX,7*PIX),new Point(4*PIX,7*PIX),new Point(4*PIX,8*PIX),new Point(3*PIX,8*PIX),
+                        new Point(3*PIX,7*PIX),new Point(2*PIX,7*PIX),new Point(2*PIX,6*PIX),new Point(1*PIX,6*PIX),
+                        new Point(1*PIX,5*PIX),new Point(0*PIX,5*PIX),new Point(0*PIX,4*PIX),
+                        new Point(1*PIX,4*PIX),new Point(1*PIX,3*PIX),new Point(3*PIX,3*PIX),
+                        new Point(this->_base)
+                       };//路线2
+
+        Point entrance[]={Point(6*PIX, 5*PIX),Point(6*PIX,4.75*PIX),Point(6*PIX,4.5*PIX),Point(6*PIX,4.25*PIX)};//入口位置(增加入口以便错开海盗)
+        int pathLengths[]={sizeof(path1)/sizeof(Point*),sizeof(path2)/sizeof(Point*)};//路径的结点个数
+        setPiratesWave(path1, path2, entrance, pathLengths);   //使用预设的1条路产生怪物方案
         timer1->setInterval(this->getPirateBlank());//修改海盗出现时间间隔
     });
 
-    //
     QTimer* timer2=new QTimer(this);
     timer2->start(150);
     connect(timer2,&QTimer::timeout,[=](){
@@ -155,30 +170,8 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
 
 //补血事件
 void World1::addLifeEvent(){
-    this->_countLifeBlank++;
-    if(this->_countLifeBlank<this->_addLifeBlank){  //未达到时间间隔
-        return;
-    }
-    else{
-        for(auto spirit:this->_spiritsVector){
-            if(spirit->getType()==1){            //是萌布布种子
-                for(auto spirit2:this->_spiritsVector){
-                    Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);
-                    Point p2(spirit2->getX()+PIX/2,spirit2->getY()+PIX/2);
-                    if(getLength(p1,p2)<spirit->getRange()){                     //在范围内
-                        if(spirit2->getLife()+this->_addLife > spirit2->getFullLife()){
-                            spirit2->setLife(spirit2->getFullLife());                       //加血只能加到上限
-                        }
-                        else{
-                            spirit2->setLife(spirit2->getLife()+this->_addLife);//加血
-                        }
-                    }
-                    else continue;
-                }
-            }
-            else continue;
-        }
-        this->_countLifeBlank=0;//归零
+    for(auto spirit:this->_spiritsVector){
+        spirit->addLife(this->_spiritsVector);
     }
 }
 
@@ -245,6 +238,12 @@ void World1::bingoPirateEvent(){
                         spirit->eraseBullet(bullet);
                         break;
                     }
+                    case 4://雷电子弹：令对手麻痹,即无法移动且无法攻击，碰到目标即消失
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        (*pirate)->setSpeed(0);//麻痹速度
+                        (*pirate)->setShocked(true);//麻痹速度
+                        (*pirate)->setCountBlank(0);//麻痹攻击
+                        spirit->eraseBullet(bullet);
                     default:
                         break;
                     }
@@ -419,7 +418,17 @@ void World1::paintEvent(QPaintEvent *){
     DrawSplash(painter);//溅伤特效
     DrawSpiritLifeBar(painter);//精灵血条
     DrawPirateLifeBar(painter);//海盗血条
+    DrawLighting(painter);//雷电特效
 
+}
+
+void World1::DrawLighting(QPainter &painter){
+    for(auto pirate:this->_pirateVector){
+        if(pirate->getShocked()){
+            painter.drawPixmap(pirate->getX(),pirate->getY(),PIX,PIX,QPixmap(":/Image/pictures/lighting.png"));
+        }
+        else continue;
+    }
 }
 
 void World1::DrawSpiritLifeBar(QPainter &painter){
@@ -461,22 +470,25 @@ void World1::DrawWave(QPainter &painter){
 }
 
 void World1::DrawAddLife(QPainter &painter){
-    if(this->_countLifeBlank >= this->_addLifeBlank-1){
-        for(auto spirit:this->_spiritsVector){
-            if(spirit->getType()==1){
-                painter.setPen(QColor("lightgreen"));
-                painter.setBrush(QBrush(QColor("lightgreen"),Qt::Dense7Pattern));//填充颜色，透明度
+    for(auto spirit:this->_spiritsVector){
+        if(spirit->getCountLifeBlank()>=spirit->getAddLifeBlank()-1){   //到了加血时间
+            if(spirit->getType()==1){                                 //是萌布布种子
+                painter.setPen(QColor("forestgreen"));
+                painter.setBrush(QBrush(QColor("forestgreen"),Qt::Dense6Pattern));//填充颜色，透明度
                 painter.drawEllipse(QPoint(spirit->getX()+PIX/2, spirit->getY()+PIX/2), spirit->getRange(), spirit->getRange());
             }
+            else{       //是普通精灵
+                painter.setPen(QColor("lawngreen"));
+                painter.setBrush(QBrush(QColor("lawngreen"),Qt::Dense7Pattern));//填充颜色，透明度
+                painter.drawEllipse(QPoint(spirit->getX()+PIX/2, spirit->getY()+PIX/2), 32, 32);
+            }
         }
+        else continue;
     }
 }
 
-//画出地图，包括：精灵屋位置、基地位置
-void World1::DrawMap1(QPainter &painter){
-    painter.drawPixmap(0,0,1152,640,QPixmap(":/Image/pictures/Map1.png"));//地图
-    painter.drawPixmap(3*PIX,2*PIX,64,64,QPixmap(":/Image/pictures/base.png"));//基地
-
+//该函数只执行一次,地图初始化后不再执行
+void World1::setMap1(){
     Point capsules[]={Point(0*PIX,3*PIX),Point(0*PIX,6*PIX),
                       Point(1*PIX,2*PIX),Point(1*PIX,7*PIX),
                       Point(2*PIX,2*PIX),Point(2*PIX,5*PIX),Point(2*PIX,8*PIX),
@@ -487,42 +499,71 @@ void World1::DrawMap1(QPainter &painter){
                       Point(7*PIX,5*PIX),Point(7*PIX,7*PIX),
                       Point(8*PIX,4*PIX),Point(8*PIX,7*PIX),Point(8*PIX,9*PIX),
                       Point(9*PIX,4*PIX),Point(9*PIX,6*PIX),Point(9*PIX,7*PIX),Point(9*PIX,9*PIX),
-                      Point(10*PIX,4*PIX),Point(10*PIX,6*PIX),Point(10*PIX,9*PIX),
+                      Point(10*PIX,4*PIX),Point(10*PIX,9*PIX),
                       Point(11*PIX,4*PIX),Point(11*PIX,6*PIX),Point(11*PIX,8*PIX),Point(11*PIX,9*PIX),
                       Point(12*PIX,4*PIX),Point(12*PIX,6*PIX),Point(12*PIX,8*PIX),
                       Point(13*PIX,4*PIX),Point(13*PIX,8*PIX),
                       Point(14*PIX,5*PIX),Point(14*PIX,8*PIX),
                       Point(15*PIX,5*PIX),Point(15*PIX,6*PIX),Point(15*PIX,7*PIX),Point(15*PIX,8*PIX)
                       };    //精灵屋位置
+
     int sumHouses=sizeof(capsules)/sizeof(Point(1,1));
     for(int i=0;i<sumHouses;i++){
-        painter.drawPixmap(capsules[i].getX(),capsules[i].getY(),PIX,PIX,QPixmap(":Image/pictures/Capsule.png"));//画出精灵屋
         this->_capsuleVector.push_back(new Capsule(capsules[i].getX(),capsules[i].getY()));//并记录下这些精灵屋的位置到Vector中
     }
+}
 
+//画出地图，包括：精灵屋位置、基地位置
+void World1::DrawMap1(QPainter &painter){
+    painter.drawPixmap(0,0,1152,640,QPixmap(":/Image/pictures/Map1.png"));//地图
+    painter.drawPixmap(3*PIX,2*PIX,64,64,QPixmap(":/Image/pictures/base.png"));//基地
+    for(auto capsule:this->_capsuleVector){
+        if(capsule->getOccupied()==0){
+            painter.drawPixmap(capsule->getX(),capsule->getY(),PIX,PIX,QPixmap(":Image/pictures/Capsule.png"));//画出精灵屋
+        }
+    }
 }
 
 void World1::addPirate(int pirateType, Point **path, int pathLength,Point& startPoint){
-    this->_pirateVector.push_back(new Pirates(path,pathLength,startPoint,pirateType));
+    switch (pirateType) {
+    case 1:
+        this->_pirateVector.push_back(new Pirate1(path,pathLength,startPoint));
+        break;
+    case 2:
+        this->_pirateVector.push_back(new Pirate2(path,pathLength,startPoint));
+        break;
+    case 3:
+        this->_pirateVector.push_back(new Pirate3(path,pathLength,startPoint));
+        break;
+    default:
+        break;
+    }
 }
 
-void World1::setPiratesWave(Point **path1, Point *entrance, int*pathLengths){
-    Point** ways[]{path1};//储存不同的线路
+void World1::setPiratesWave(Point **path1, Point **path2, Point *entrance, int*pathLengths){
+    Point** ways[]{path1,path2};//储存不同的线路(增加了1条线路)
     //加入海盗
     if(this->_count >= 1 && this->_count <= 10){
         addPirate(1,ways[0],pathLengths[0],entrance[0]); //海盗类型，路径，路径长度，起始点
+        addPirate(1,ways[1],pathLengths[1],entrance[3]);
     }
     else if(this->_count>=10 && this->_count<=14){
-        this->setPirateBlank(1000);
         addPirate(2,ways[0],pathLengths[0],entrance[0]);
+        addPirate(2,ways[1],pathLengths[1],entrance[3]);
     }
-    else if(this->_count>=15 && this->_count<=30){
-        this->setPirateBlank(2000);
+    else if(this->_count>=15 && this->_count<=20){
+        this->setPirateBlank(4000);
         addPirate(1,ways[0],pathLengths[0],entrance[0]);
-        addPirate(2,ways[0],pathLengths[0],entrance[0]);
-
+        addPirate(2,ways[0],pathLengths[0],entrance[2]);
+        addPirate(1,ways[1],pathLengths[1],entrance[1]);
+        addPirate(2,ways[1],pathLengths[1],entrance[3]);
     }
-    else if(this->_count>=31){
+    else if(this->_count>=21&& this->_count<=22){
+        this->setPirateBlank(3000);
+        addPirate(3,ways[0],pathLengths[0],entrance[0]);
+        addPirate(3,ways[1],pathLengths[1],entrance[2]);
+    }
+    else if(this->_count>=23){
         if(this->_pirateVector.empty()){                 //海盗出完了,且海盗打完了
             this->_winLabel->show();
             this->_theEnd=true;
@@ -650,6 +691,15 @@ void World1::mousePressEvent(QMouseEvent *ev){
                         this->_spiritsVector.push_back(new MengYiYou(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
                         Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
                         this->setCapsuleOccupied(p1,3);
+                    }
+                    break;
+                }
+                case 3://雷伊
+                {
+                    if(this->canBuy(500)){    //够钱
+                        this->_spiritsVector.push_back(new LeiYi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                        this->setCapsuleOccupied(p1,4);
                     }
                     break;
                 }

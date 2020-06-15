@@ -20,7 +20,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    void DrawLogin(QPainter&painter);
+    void DrawInterface(QPainter&painter);
 };
 
 #endif // MAINWINDOW_H

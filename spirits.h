@@ -19,12 +19,15 @@ public:
     int getFullLife()const;
     int getFireBlank()const;//攻击间隔
     int getType()const;
+    int getAddLifeBlank()const;
+    int getCountLifeBlank()const;
 
     void setTarget(Pirates* target);//设置当前精灵的目标怪物
     void addBullet(); //新建子弹
     void fireBullets();//管理该精灵所有子弹的移动
     void eraseBullet(Bullet** bullet);//删除第i个子弹
     void setLife(const int life);
+    void addLife(QVector<Spirits *> &spiritsVector);//管理该精灵的补血事件
 
     QString getImagePath()const;//获得图片路径
     QString getRangeColor()const;//获得攻击范围的颜色
@@ -41,6 +44,9 @@ protected:
     int _countBlank=0;//一直变动,用来计算攻击间隔
     int _life;//生命
     int _fullLife;//生命上限
+    int _addLifeBlank;//每只精灵的补血间隔
+    int _countLifeBlank;//计算补血间隔
+    int _addLife;//每次加多少血
 
     Point _p;//精灵左上角坐标
 

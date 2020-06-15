@@ -41,7 +41,14 @@ SOURCES += \
     redbullet.cpp \
     selectionbox.cpp \
     subbutton.cpp \
-    world1.cpp
+    world1.cpp \
+    interface.cpp \
+    pirate1.cpp \
+    pirate2.cpp \
+    pirate3.cpp \
+    brownbullet.cpp \
+    leiyi.cpp \
+    lightingbullet.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -59,7 +66,14 @@ HEADERS += \
     redbullet.h \
     selectionbox.h \
     subbutton.h \
-    world1.h
+    world1.h \
+    interface.h \
+    pirate1.h \
+    pirate2.h \
+    pirate3.h \
+    brownbullet.h \
+    leiyi.h \
+    lightingbullet.h
 
 FORMS += \
         mainwindow.ui
@@ -67,5 +81,4 @@ FORMS += \
 RESOURCES += \
     pics.qrc \
     snds.qrc
-
 
