@@ -64,6 +64,7 @@ private:
     void DrawSpiritLifeBar(QPainter& painter);//精灵血条
     void DrawPirateLifeBar(QPainter& painter);//海盗血条
     void DrawLighting(QPainter& painter);//雷电特效
+    void DrawPuNiAttack(QPainter& painter);//谱尼攻击特效
     void setPiratesWave(Point **path1, Point **path2, Point *entrance, int* pathLengths);//设置每波海盗的形式
     void setCapsuleOccupied(const Point&p,const int k);//标记已有精灵的胶囊
     void setPirateBlank(const int blank);

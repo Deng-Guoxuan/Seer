@@ -3,8 +3,16 @@
 #include "redbullet.h"
 #include "bluebullet.h"
 #include "lightingbullet.h"
+#include "knifebullet.h"
+#include "shiningbullet.h"
 
 const int PIX=64;//一格的像素
+
+Point directions[]={Point(0,0),Point(0,2*PIX),Point(0,4*PIX),Point(0,6*PIX),Point(0,8*PIX),Point(0,10*PIX),
+                    Point(18*PIX,0),Point(18*PIX,2*PIX),Point(18*PIX,4*PIX),Point(18*PIX,6*PIX),Point(18*PIX,8*PIX),Point(10*PIX,18*PIX),
+                    Point(0,0),Point(2*PIX,0),Point(4*PIX,0),Point(6*PIX,0),Point(8*PIX,0),Point(10*PIX,0),Point(12*PIX,0),Point(14*PIX,0),Point(16*PIX,0),Point(18*PIX,0),
+                    Point(0,10*PIX),Point(2*PIX,10*PIX),Point(4*PIX,10*PIX),Point(6*PIX,10*PIX),Point(8*PIX,10*PIX),Point(10*PIX,10*PIX),Point(12*PIX,10*PIX),Point(14*PIX,10*PIX),Point(16*PIX,10*PIX),Point(18*PIX,10*PIX)};
+const int dirL=sizeof(directions)/sizeof(Point);
 
 Spirits::Spirits(int x, int y):_p(x,y){}
 
@@ -56,6 +64,14 @@ int Spirits::getAddLifeBlank()const{
     return this->_addLifeBlank;
 }
 
+int Spirits::getCountFireBlank()const{
+    return this->_countBlank;
+}
+
+void Spirits::setCountFireBlank(const int num){
+    this->_countBlank=num;
+}
+
 void Spirits::addLife(QVector<Spirits *> &spiritsVector){
     this->_countLifeBlank++;
 
@@ -90,11 +106,12 @@ void Spirits::addLife(QVector<Spirits *> &spiritsVector){
 void Spirits::addBullet(){
     this->_countBlank++;
 
-    if(this->_countBlank<this->getFireBlank()||!this->_target){ //没有达到时间间隔或没有目标,不用新建子弹
+    if(this->_countBlank<this->getFireBlank()||(this->_type!=6&&!this->_target)){ //没有达到时间间隔或非谱尼且没有目标,不用新建子弹
         return;
     }
     else{
         Point p1(this->getX()+PIX/2,this->getY()+PIX/2);//精灵的中心点
+        if(this->_type!=6){
         Point p2(this->_target->getX()+PIX/2,this->_target->getY()+PIX/2);//目标的中心点
         switch (this->_type){
         case 1:                   //萌布布种子:绿子弹
@@ -117,10 +134,24 @@ void Spirits::addBullet(){
             this->_bulletVector.push_back(new LightingBullet(p1,p2));
             break;
         }
+        case 5:
+        {
+            this->_bulletVector.push_back(new KnifeBullet(p1,p2));
+            break;
+        }
         default:
             break;
         }
+        }
+        else{//谱尼增加子弹
+            for(int i=0;i<dirL;i++){
+                this->_bulletVector.push_back(new ShiningBullet(p1,directions[i]));
+            }
+        }
+
         this->_countBlank=0;//归零
+
+
     }
 }
 

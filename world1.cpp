@@ -7,6 +7,8 @@
 #include "menghuohou.h"
 #include "mengyiyou.h"
 #include "leiyi.h"
+#include "yingkaluosi.h"
+#include "puni.h"
 #include "pirate1.h"
 #include "pirate2.h"
 #include "pirate3.h"
@@ -86,13 +88,12 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
             this->close();
         }
         this->allPiratesMove();//界面所有海盗移动
-        this->allSpiritsFindTarget();//界面所有精灵找目标
+        this->allPirateFindTarget();//界面所有海盗找目标
+        this->bingoSpiritEvent();//击中精灵事件
 
+        this->allSpiritsFindTarget();//界面所有精灵找目标
         this->bingoPirateEvent();//击中海盗事件
 
-        this->allPirateFindTarget();//界面所有海盗找目标
-
-        this->bingoSpiritEvent();//击中精灵事件
         update();//画图
     });
 
@@ -112,7 +113,13 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
     connect(timer4,&QTimer::timeout,[=](){
         this->addLifeEvent();
     });
-
+/*
+    QTimer* timer5=new QTimer(this);
+    timer5->start(150);//与上面刷新时间保持一致
+    connect(timer5,&QTimer::timeout,[=](){
+        this->PuNiFireEvent();
+    });
+*/
     //一键显示所有精灵攻击范围按钮
     QPushButton* displayAllSpiritRangePush = new QPushButton(this);
     displayAllSpiritRangePush->setStyleSheet("color:black");
@@ -175,6 +182,7 @@ void World1::addLifeEvent(){
     }
 }
 
+
 //击中精灵事件
 void World1::bingoSpiritEvent(){
     for(auto pirate:this->_pirateVector){                 //遍历海盗
@@ -199,8 +207,6 @@ void World1::bingoSpiritEvent(){
         }
     }
 }
-
-
 
 
 //击中海盗事件
@@ -238,15 +244,30 @@ void World1::bingoPirateEvent(){
                         spirit->eraseBullet(bullet);
                         break;
                     }
-                    case 4://雷电子弹：令对手麻痹,即无法移动且无法攻击，碰到目标即消失
+                    case 5://雷电子弹：令对手麻痹,即无法移动且无法攻击，碰到目标即消失
+                    {
                         (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
                         (*pirate)->setSpeed(0);//麻痹速度
                         (*pirate)->setShocked(true);//麻痹速度
                         (*pirate)->setCountBlank(0);//麻痹攻击
                         spirit->eraseBullet(bullet);
+                        break;
+                    }
+                    case 6://刀刃子弹：穿透敌人功能，碰到目标不会消失
+                    {
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        break;
+                    }
+                    case 8://光弹：碰到目标即消失,无其他功能
+                    {
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        spirit->eraseBullet(bullet);
+                        break;
+                    }
                     default:
                         break;
                     }
+
 
                     if((*pirate)->getLife()<=0){        //海盗没血了
                         //判断一下其他精灵的目标怪物是否和当前精灵消灭的怪物重复，如果重复，则将那一个防御塔的目标怪物也设为空
@@ -267,6 +288,7 @@ void World1::bingoPirateEvent(){
         }
     }
 }
+
 
 //界面所有海盗找目标
 void World1::allPirateFindTarget(){
@@ -289,29 +311,33 @@ void World1::allPirateFindTarget(){
 void World1::allSpiritsFindTarget(){
     //精灵寻找目标海盗的规律：找到最前一个海盗作为目标，目标丢失后找再继续找下一个目标
     for (auto spirit : this->_spiritsVector){       //遍历精灵
-        if(!spirit->getTarget()){                   //若当前没有目标海盗
-            for(int i = 0; i <=this->_pirateVector.size() - 1; i++){                 //遍历海盗
-                //这里以精灵中心点和怪物中心点判断
-                Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);
-                Point p2(this->_pirateVector.at(i)->getX()+PIX/2,this->_pirateVector.at(i)->getY()+PIX/2);
-                if (this->inRange(getLength(p1,p2),spirit->getRange())){             //如果在攻击范围内
-                    spirit->setTarget(this->_pirateVector.at(i));                    //设置精灵的目标怪物
-                    break;                                                           //找到后立刻跳出循环
+        if(spirit->getType()!=6){                   //6号精灵谱尼不是这样找目标的
+            if(!spirit->getTarget()){                   //若当前没有目标海盗
+                for(int i = 0; i <=this->_pirateVector.size() - 1; i++){                 //遍历海盗
+                    //这里以精灵中心点和怪物中心点判断
+                    Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);
+                    Point p2(this->_pirateVector.at(i)->getX()+PIX/2,this->_pirateVector.at(i)->getY()+PIX/2);
+                    if (this->inRange(getLength(p1,p2),spirit->getRange())){             //如果在攻击范围内
+                        spirit->setTarget(this->_pirateVector.at(i));                    //设置精灵的目标怪物
+                        break;                                                           //找到后立刻跳出循环
+                    }
+                    else{}
                 }
-                else{}
+            }
+            else{                 //当前已经有了目标海盗
+                //先判断在不在攻击范围内
+                Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);//精灵中心点
+                Point p2(spirit->getTarget()->getX()+PIX/2,spirit->getTarget()->getY()+PIX/2);//海盗中心点
+                if(!this->inRange(getLength(p1,p2),spirit->getRange())){                 //如果不在攻击范围内了
+                    spirit->setTarget(NULL); //目标置为空
+                }
+                else{               //目标在攻击范围内
+                    spirit->addBullet();//一直增加子弹
+                }
             }
         }
-        else{                 //当前已经有了目标海盗
-            //先判断在不在攻击范围内
-            Point p1(spirit->getX()+PIX/2,spirit->getY()+PIX/2);//精灵中心点
-            Point p2(spirit->getTarget()->getX()+PIX/2,spirit->getTarget()->getY()+PIX/2);//海盗中心点
-            if(!this->inRange(getLength(p1,p2),spirit->getRange())){                 //如果不在攻击范围内了
-                spirit->setTarget(NULL); //目标置为空
-            }
-            else{               //目标在攻击范围内
-                spirit->addBullet();//一直增加子弹
-            }
-        }
+        else spirit->addBullet();//谱尼一直增加子弹
+//        else continue;
     }
 }
 
@@ -360,10 +386,13 @@ void World1::redBulletEffect(Point &p,int damage){
 void World1::blueBulletEffect(Point &p, double percentage){
     for(auto pirate:this->_pirateVector){
         Point p2(pirate->getX()+PIX/2,pirate->getY()+PIX/2);
-        if(getLength(p,p2)<=100){                      //100范围内海盗减速
+        if(getLength(p,p2)<=100){       //100范围内海盗减速
             this->_wavedPointVector.push_back(new Point(p2));//加入一个要画海浪的点
-            pirate->setSpeed(pirate->getFullSpeed()*percentage);//设置新的速度
-            pirate->setWaved(true);//减速标记
+            if(pirate->getSpeed()!=0){            //该海盗没有被麻痹才能减速
+                pirate->setWaved(true);//减速标记
+                pirate->setSpeed(pirate->getFullSpeed()*percentage);//设置新的速度
+            }
+            else{}
         }
     }
 }
@@ -419,7 +448,24 @@ void World1::paintEvent(QPaintEvent *){
     DrawSpiritLifeBar(painter);//精灵血条
     DrawPirateLifeBar(painter);//海盗血条
     DrawLighting(painter);//雷电特效
+    DrawPuNiAttack(painter);//谱尼攻击特效
+}
 
+void World1::DrawPuNiAttack(QPainter &painter){
+    for(auto spirit:this->_spiritsVector){
+        if(spirit->getType()==6){
+            if(spirit->getCountFireBlank()>=spirit->getFireBlank()-5){
+                painter.setPen(QColor("gold"));
+                painter.setBrush(QBrush(QColor("gold"),Qt::Dense5Pattern));//填充颜色，透明度
+                painter.drawEllipse(QPoint(spirit->getX()+32, spirit->getY()-32), 96, 12);
+                painter.drawEllipse(QPoint(spirit->getX()+32, spirit->getY()+96), 96, 12);
+                painter.setBrush(Qt::NoBrush);
+                painter.drawPixmap(spirit->getX(),spirit->getY(),PIX,PIX,QPixmap(":/Image/pictures/bagua.png"));
+            }
+            else continue;
+        }
+        else continue;
+    }
 }
 
 void World1::DrawLighting(QPainter &painter){
@@ -436,7 +482,7 @@ void World1::DrawSpiritLifeBar(QPainter &painter){
         for(auto spirit:this->_spiritsVector){
             int lifeLength=spirit->getLife()*(PIX-8)/spirit->getFullLife();//剩余血量
             painter.drawPixmap(spirit->getX()+4,spirit->getY()-PIX/4,lifeLength,PIX/8,QPixmap(":/Image/pictures/redBar.png"));
-            painter.drawPixmap(spirit->getX()+lifeLength,spirit->getY()-PIX/4,PIX-8-lifeLength,PIX/8,QPixmap(":/Image/pictures/whiteBar.png"));
+            painter.drawPixmap(spirit->getX()+4+lifeLength,spirit->getY()-PIX/4,PIX-8-lifeLength,PIX/8,QPixmap(":/Image/pictures/whiteBar.png"));
             painter.setPen(QPen(Qt::yellow, 1, Qt::SolidLine));//设置画笔，黄色，实线
             painter.drawRect(QRect(spirit->getX()+4,spirit->getY()-PIX/4,PIX-8,PIX/8));//将选中区域用黄色实线框起来
         }
@@ -449,7 +495,7 @@ void World1::DrawPirateLifeBar(QPainter &painter){
         for(auto pirate:this->_pirateVector){
             int lifeLength=pirate->getLife()*(PIX-8)/pirate->getFullLife();//剩余血量
             painter.drawPixmap(pirate->getX()+4,pirate->getY()-PIX/4,lifeLength,PIX/8,QPixmap(":/Image/pictures/redBar.png"));
-            painter.drawPixmap(pirate->getX()+lifeLength,pirate->getY()-PIX/4,PIX-8-lifeLength,PIX/8,QPixmap(":/Image/pictures/whiteBar.png"));
+            painter.drawPixmap(pirate->getX()+4+lifeLength,pirate->getY()-PIX/4,PIX-8-lifeLength,PIX/8,QPixmap(":/Image/pictures/whiteBar.png"));
             painter.setPen(QPen(Qt::yellow, 1, Qt::SolidLine));//设置画笔，黄色，实线
             painter.drawRect(QRect(pirate->getX()+4,pirate->getY()-PIX/4,PIX-8,PIX/8));//将选中区域用黄色实线框起来
         }
@@ -476,11 +522,13 @@ void World1::DrawAddLife(QPainter &painter){
                 painter.setPen(QColor("forestgreen"));
                 painter.setBrush(QBrush(QColor("forestgreen"),Qt::Dense6Pattern));//填充颜色，透明度
                 painter.drawEllipse(QPoint(spirit->getX()+PIX/2, spirit->getY()+PIX/2), spirit->getRange(), spirit->getRange());
+                painter.setBrush(Qt::NoBrush);
             }
             else{       //是普通精灵
                 painter.setPen(QColor("lawngreen"));
                 painter.setBrush(QBrush(QColor("lawngreen"),Qt::Dense7Pattern));//填充颜色，透明度
                 painter.drawEllipse(QPoint(spirit->getX()+PIX/2, spirit->getY()+PIX/2), 32, 32);
+                painter.setBrush(Qt::NoBrush);
             }
         }
         else continue;
@@ -547,23 +595,23 @@ void World1::setPiratesWave(Point **path1, Point **path2, Point *entrance, int*p
         addPirate(1,ways[0],pathLengths[0],entrance[0]); //海盗类型，路径，路径长度，起始点
         addPirate(1,ways[1],pathLengths[1],entrance[3]);
     }
-    else if(this->_count>=10 && this->_count<=14){
+    else if(this->_count>=11 && this->_count<=16){
         addPirate(2,ways[0],pathLengths[0],entrance[0]);
         addPirate(2,ways[1],pathLengths[1],entrance[3]);
     }
-    else if(this->_count>=15 && this->_count<=20){
+    else if(this->_count>=17 && this->_count<=22){
         this->setPirateBlank(4000);
         addPirate(1,ways[0],pathLengths[0],entrance[0]);
         addPirate(2,ways[0],pathLengths[0],entrance[2]);
         addPirate(1,ways[1],pathLengths[1],entrance[1]);
         addPirate(2,ways[1],pathLengths[1],entrance[3]);
     }
-    else if(this->_count>=21&& this->_count<=22){
-        this->setPirateBlank(3000);
+    else if(this->_count>=23&& this->_count<=25){
+        this->setPirateBlank(2500);
         addPirate(3,ways[0],pathLengths[0],entrance[0]);
         addPirate(3,ways[1],pathLengths[1],entrance[2]);
     }
-    else if(this->_count>=23){
+    else if(this->_count>=26){
         if(this->_pirateVector.empty()){                 //海盗出完了,且海盗打完了
             this->_winLabel->show();
             this->_theEnd=true;
@@ -581,6 +629,7 @@ void World1::DrawPirate(QPainter &painter){
             painter.setPen(QColor(pirate->getRangeColor()));//根据海盗的不同绘制不同颜色的攻击范围框
             painter.setBrush(QBrush(QColor(pirate->getRangeColor()),Qt::Dense5Pattern));//填充颜色，透明度
             painter.drawEllipse(QPoint(pirate->getX()+PIX/2, pirate->getY()+PIX/2), pirate->getRange(), pirate->getRange());
+            painter.setBrush(Qt::NoBrush);
         }
 
 
@@ -588,6 +637,7 @@ void World1::DrawPirate(QPainter &painter){
         //画出子弹
         for(auto bullet:pirate->getBulletVector()){
             painter.drawPixmap(bullet->getX()-PIX/4,bullet->getY()-PIX/4,PIX/2,PIX/2,QPixmap(bullet->getImagePath()));
+            painter.setBrush(Qt::NoBrush);
         }
     }
 }
@@ -600,6 +650,7 @@ void World1::DrawSpirits(QPainter &painter){
             painter.setPen(QColor(spirit->getRangeColor()));//根据精灵的不同绘制不同颜色的攻击范围框
             painter.setBrush(QBrush(QColor(spirit->getRangeColor()),Qt::Dense5Pattern));//填充颜色，透明度
             painter.drawEllipse(QPoint(spirit->getX()+PIX/2, spirit->getY()+PIX/2), spirit->getRange(), spirit->getRange());
+            painter.setBrush(Qt::NoBrush);
         }
 
         //画出精灵
@@ -700,6 +751,24 @@ void World1::mousePressEvent(QMouseEvent *ev){
                         this->_spiritsVector.push_back(new LeiYi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
                         Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
                         this->setCapsuleOccupied(p1,4);
+                    }
+                    break;
+                }
+                case 4://英卡洛斯
+                {
+                    if(this->canBuy(700)){
+                        this->_spiritsVector.push_back(new YingKaLuoSi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                        this->setCapsuleOccupied(p1,5);
+                    }
+                    break;
+                }
+                case 5://谱尼
+                {
+                    if(this->canBuy(1000)){
+                        this->_spiritsVector.push_back(new PuNi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                        this->setCapsuleOccupied(p1,6);
                     }
                     break;
                 }

@@ -34,5 +34,8 @@
         <file>pictures/brownBullet.png</file>
         <file>pictures/lightingBullet.png</file>
         <file>pictures/lighting.png</file>
+        <file>pictures/knifeBullet.png</file>
+        <file>pictures/shiningBullet.png</file>
+        <file>pictures/bagua.png</file>
     </qresource>
 </RCC>

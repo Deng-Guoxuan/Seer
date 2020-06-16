@@ -48,7 +48,11 @@ SOURCES += \
     pirate3.cpp \
     brownbullet.cpp \
     leiyi.cpp \
-    lightingbullet.cpp
+    lightingbullet.cpp \
+    yingkaluosi.cpp \
+    knifebullet.cpp \
+    puni.cpp \
+    shiningbullet.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -73,7 +77,11 @@ HEADERS += \
     pirate3.h \
     brownbullet.h \
     leiyi.h \
-    lightingbullet.h
+    lightingbullet.h \
+    yingkaluosi.h \
+    knifebullet.h \
+    puni.h \
+    shiningbullet.h
 
 FORMS += \
         mainwindow.ui

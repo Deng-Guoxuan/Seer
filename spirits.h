@@ -18,6 +18,7 @@ public:
     int getLife()const;
     int getFullLife()const;
     int getFireBlank()const;//攻击间隔
+    int getCountFireBlank()const;//计算攻击间隔
     int getType()const;
     int getAddLifeBlank()const;
     int getCountLifeBlank()const;
@@ -28,6 +29,7 @@ public:
     void eraseBullet(Bullet** bullet);//删除第i个子弹
     void setLife(const int life);
     void addLife(QVector<Spirits *> &spiritsVector);//管理该精灵的补血事件
+    void setCountFireBlank(const int num);
 
     QString getImagePath()const;//获得图片路径
     QString getRangeColor()const;//获得攻击范围的颜色
