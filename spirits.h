@@ -1,6 +1,9 @@
 #ifndef SPIRITS_H
 #define SPIRITS_H
 
+//精灵编号：1萌布布种子,2萌火猴,3萌伊尤,4雷伊,5英卡洛斯,6谱尼
+//        7蒙娜丽莎,8炽焰金刚,9利爪鲁斯王,10S_雷伊,11S_英卡洛斯,12S_谱尼
+
 #include <QString>
 #include "point.h"
 #include "pirates.h"

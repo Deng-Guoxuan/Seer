@@ -5,6 +5,12 @@
 #include "lightingbullet.h"
 #include "knifebullet.h"
 #include "shiningbullet.h"
+#include "flowerbullet.h"
+#include "firebullet.h"
+#include "waterbullet.h"
+#include "thunderbullet.h"
+#include "swordbullet.h"
+#include "sunbullet.h"
 
 const int PIX=64;//一格的像素
 
@@ -78,11 +84,18 @@ void Spirits::addLife(QVector<Spirits *> &spiritsVector){
     if(this->_countLifeBlank<this->_addLifeBlank){ //没到时间不能补血
         return;
     }
-    else if(this->_type==1){                     //这是萌布布种子,有补血技能
+    else if(this->_type==1||this->_type==7){//这是萌布布种子或其进化形态蒙娜丽莎,有补血技能
+        int addRange=0;
+        if(this->_type==1){
+            addRange=120;
+        }
+        else{
+            addRange=200;
+        }
         for(auto spirit:spiritsVector){
             Point p1(this->getX()+PIX/2,this->getY()+PIX/2);
             Point p2(spirit->getX()+PIX/2,spirit->getY()+PIX/2);
-            if(getLength(p1,p2)<=this->getRange()){                    //在范围内
+            if(getLength(p1,p2)<=addRange){                    //在范围内
                 if(spirit->getLife()+this->_addLife > spirit->getFullLife()){
                     spirit->setLife(spirit->getFullLife());                       //加血只能加到上限
                 }
@@ -106,52 +119,83 @@ void Spirits::addLife(QVector<Spirits *> &spiritsVector){
 void Spirits::addBullet(){
     this->_countBlank++;
 
-    if(this->_countBlank<this->getFireBlank()||(this->_type!=6&&!this->_target)){ //没有达到时间间隔或非谱尼且没有目标,不用新建子弹
+    if(this->_countBlank<this->getFireBlank()){ //没有达到时间间隔
+        return;
+    }
+    else if(this->_type!=6&&this->_type!=12&&!this->_target){//非谱尼且没有目标,不用新建子弹
         return;
     }
     else{
         Point p1(this->getX()+PIX/2,this->getY()+PIX/2);//精灵的中心点
-        if(this->_type!=6){
-        Point p2(this->_target->getX()+PIX/2,this->_target->getY()+PIX/2);//目标的中心点
-        switch (this->_type){
-        case 1:                   //萌布布种子:绿子弹
-        {
-            this->_bulletVector.push_back(new GreenBullet(p1,p2));
-            break;
-        }
-        case 2:
-        {
-            this->_bulletVector.push_back(new RedBullet(p1,p2));
-            break;
-        }
-        case 3:
-        {
-            this->_bulletVector.push_back(new BlueBullet(p1,p2));
-            break;
-        }
-        case 4:
-        {
-            this->_bulletVector.push_back(new LightingBullet(p1,p2));
-            break;
-        }
-        case 5:
-        {
-            this->_bulletVector.push_back(new KnifeBullet(p1,p2));
-            break;
-        }
-        default:
-            break;
-        }
-        }
-        else{//谱尼增加子弹
-            for(int i=0;i<dirL;i++){
-                this->_bulletVector.push_back(new ShiningBullet(p1,directions[i]));
+        if(this->_type!=6&&this->_type!=12){
+            Point p2(this->_target->getX()+PIX/2,this->_target->getY()+PIX/2);//目标的中心点
+            switch (this->_type){
+            case 1://萌布布种子:绿子弹
+            {
+                this->_bulletVector.push_back(new GreenBullet(p1,p2));
+                break;
+            }
+            case 2://萌火猴
+            {
+                this->_bulletVector.push_back(new RedBullet(p1,p2));
+                break;
+            }
+            case 3://萌伊尤
+            {
+                this->_bulletVector.push_back(new BlueBullet(p1,p2));
+                break;
+            }
+            case 4://雷伊
+            {
+                this->_bulletVector.push_back(new LightingBullet(p1,p2));
+                break;
+            }
+            case 5://英卡洛斯
+            {
+                this->_bulletVector.push_back(new KnifeBullet(p1,p2));
+                break;
+            }
+            case 7://蒙娜丽莎
+            {
+                this->_bulletVector.push_back(new FlowerBullet(p1,p2));
+                break;
+            }
+            case 8://炽焰金刚
+            {
+                this->_bulletVector.push_back(new FireBullet(p1,p2));
+                break;
+            }
+            case 9://利爪鲁斯王
+            {
+                this->_bulletVector.push_back(new WaterBullet(p1,p2));
+                break;
+            }
+            case 10://S_雷伊
+            {
+                this->_bulletVector.push_back(new ThunderBullet(p1,p2));
+                break;
+            }
+            case 11://S_英卡洛斯
+            {
+                this->_bulletVector.push_back(new SwordBullet(p1,p2));
+                break;
+            }
+            default:break;
             }
         }
-
+        else{                                  //谱尼或S_谱尼增加子弹
+            if(this->_type==6){
+                for(int i=0;i<dirL;i++){
+                    this->_bulletVector.push_back(new ShiningBullet(p1,directions[i]));
+                }
+            }
+            else{
+                for(int i=0;i<dirL;i++){
+                    this->_bulletVector.push_back(new SunBullet(p1,directions[i]));
+                }
+            }
+        }
         this->_countBlank=0;//归零
-
-
     }
 }
 

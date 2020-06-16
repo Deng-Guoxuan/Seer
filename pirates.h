@@ -1,6 +1,8 @@
 #ifndef PIRATES_H
 #define PIRATES_H
 
+//
+
 #include <QString>
 #include <QVector>
 #include "point.h"

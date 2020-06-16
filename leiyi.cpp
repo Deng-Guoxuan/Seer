@@ -5,8 +5,8 @@ LeiYi::LeiYi(int x, int y):Spirits(x,y)
     this->_type=4;
     this->_range=160;
     this->_cost=500;
-    this->_fireBlank=6;
-    this->_countBlank=6;
+    this->_fireBlank=8;
+    this->_countBlank=8;
     this->_imagePath=QString(":/Image/pictures/LeiYi.png");
     this->_rangeColor="yellow";
     this->_life=160;

@@ -52,7 +52,20 @@ SOURCES += \
     yingkaluosi.cpp \
     knifebullet.cpp \
     puni.cpp \
-    shiningbullet.cpp
+    shiningbullet.cpp \
+    envovlebox.cpp \
+    mengnalisha.cpp \
+    flowerbullet.cpp \
+    chiyanjingang.cpp \
+    firebullet.cpp \
+    lizhualusiwang.cpp \
+    waterbullet.cpp \
+    s_puni.cpp \
+    s_leiyi.cpp \
+    s_yingkaluosi.cpp \
+    sunbullet.cpp \
+    thunderbullet.cpp \
+    swordbullet.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -81,7 +94,20 @@ HEADERS += \
     yingkaluosi.h \
     knifebullet.h \
     puni.h \
-    shiningbullet.h
+    shiningbullet.h \
+    envovlebox.h \
+    mengnalisha.h \
+    flowerbullet.h \
+    chiyanjingang.h \
+    firebullet.h \
+    lizhualusiwang.h \
+    waterbullet.h \
+    s_puni.h \
+    s_leiyi.h \
+    s_yingkaluosi.h \
+    sunbullet.h \
+    thunderbullet.h \
+    swordbullet.h
 
 FORMS += \
         mainwindow.ui

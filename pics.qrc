@@ -37,5 +37,20 @@
         <file>pictures/knifeBullet.png</file>
         <file>pictures/shiningBullet.png</file>
         <file>pictures/bagua.png</file>
+        <file>pictures/MengNaLiSha.png</file>
+        <file>pictures/recycle.png</file>
+        <file>pictures/envovleBox.png</file>
+        <file>pictures/flowerBullet.png</file>
+        <file>pictures/ChiYanJinGang.png</file>
+        <file>pictures/fireBullet.png</file>
+        <file>pictures/LiZhuaLuSiWang.png</file>
+        <file>pictures/waterBullet.png</file>
+        <file>pictures/S_LeiYi.png</file>
+        <file>pictures/S_PuNi.png</file>
+        <file>pictures/S_YingKaLuoSi.png</file>
+        <file>pictures/sunBullet.png</file>
+        <file>pictures/swordBullet.png</file>
+        <file>pictures/thunderBullet.png</file>
+        <file>pictures/lock.png</file>
     </qresource>
 </RCC>

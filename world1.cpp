@@ -9,6 +9,12 @@
 #include "leiyi.h"
 #include "yingkaluosi.h"
 #include "puni.h"
+#include "mengnalisha.h"
+#include "chiyanjingang.h"
+#include "lizhualusiwang.h"
+#include "s_leiyi.h"
+#include "s_yingkaluosi.h"
+#include "s_puni.h"
 #include "pirate1.h"
 #include "pirate2.h"
 #include "pirate3.h"
@@ -223,6 +229,7 @@ void World1::bingoPirateEvent(){
                 Point p1((*bullet)->getX(),(*bullet)->getY());   //子弹中心
                 Point p2((*pirate)->getX()+PIX/2,(*pirate)->getY()+PIX/2);   //海盗中心
                 if(this->isBingo(p1,p2)){                    //击中
+                    //子弹编号：1绿,2红,3蓝,4黑,5电,6刀,7棕,8光,9花,10火,11水
                     switch ((*bullet)->getType()) {               //根据子弹类型触发不同效果
                     case 1://绿子弹：无其他效果,碰到目标即消失
                     {
@@ -232,14 +239,14 @@ void World1::bingoPirateEvent(){
                     }
                     case 2://红子弹：范围溅伤效果,碰到目标即消失
                     {
-                        redBulletEffect(p1,(*bullet)->getAttack());
+                        redBulletEffect(p1,(*bullet)->getAttack(),2);
                         (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
                         spirit->eraseBullet(bullet);
                         break;
                     }
                     case 3://蓝子弹：范围减速效果,碰到目标即消失
                     {
-                        blueBulletEffect(p1,0.5);
+                        blueBulletEffect(p1,0.7,3);
                         (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
                         spirit->eraseBullet(bullet);
                         break;
@@ -259,6 +266,46 @@ void World1::bingoPirateEvent(){
                         break;
                     }
                     case 8://光弹：碰到目标即消失,无其他功能
+                    {
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        spirit->eraseBullet(bullet);
+                        break;
+                    }
+                    case 9://花子弹：无其他效果,碰到目标即消失
+                    {
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        spirit->eraseBullet(bullet);
+                        break;
+                    }
+                    case 10://火子弹：红子弹升级版,溅伤范围更大,伤害更高
+                    {
+                        redBulletEffect(p1,(*bullet)->getAttack(),8);
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        spirit->eraseBullet(bullet);
+                        break;
+                    }
+                    case 11://水子弹：蓝子弹的升级版,减速范围更大,减速更多,伤害更高
+                    {
+                        blueBulletEffect(p1,0.3,11);
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        spirit->eraseBullet(bullet);
+                        break;
+                    }
+                    case 12://雷子弹：电子弹的升级版
+                    {
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        (*pirate)->setSpeed(0);//麻痹速度
+                        (*pirate)->setShocked(true);//麻痹速度
+                        (*pirate)->setCountBlank(0);//麻痹攻击
+                        spirit->eraseBullet(bullet);
+                        break;
+                    }
+                    case 13://剑子弹：刀子弹的升级版
+                    {
+                        (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
+                        break;
+                    }
+                    case 14://阳弹：光弹的升级版
                     {
                         (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
                         spirit->eraseBullet(bullet);
@@ -311,7 +358,7 @@ void World1::allPirateFindTarget(){
 void World1::allSpiritsFindTarget(){
     //精灵寻找目标海盗的规律：找到最前一个海盗作为目标，目标丢失后找再继续找下一个目标
     for (auto spirit : this->_spiritsVector){       //遍历精灵
-        if(spirit->getType()!=6){                   //6号精灵谱尼不是这样找目标的
+        if(spirit->getType()!=6&&spirit->getType()!=12){                   //6、12号精灵谱尼不是这样找目标的
             if(!spirit->getTarget()){                   //若当前没有目标海盗
                 for(int i = 0; i <=this->_pirateVector.size() - 1; i++){                 //遍历海盗
                     //这里以精灵中心点和怪物中心点判断
@@ -337,7 +384,6 @@ void World1::allSpiritsFindTarget(){
             }
         }
         else spirit->addBullet();//谱尼一直增加子弹
-//        else continue;
     }
 }
 
@@ -372,10 +418,18 @@ void World1::allPiratesMove(){
 }
 
 //萌火猴的红子弹范围溅伤效果：传入当前命中目标的中心点,以及该子弹的攻击力(溅伤四分之一的攻击力)
-void World1::redBulletEffect(Point &p,int damage){
+void World1::redBulletEffect(Point &p,int damage,int type){
+    int splashRange=0;
+    if(type==2){
+        splashRange=80;
+    }
+    else if(type==8){//进化后
+        splashRange=120;
+    }
+
     for(auto pirate:this->_pirateVector){        //遍历海盗
         Point p2(pirate->getX()+PIX/2,pirate->getY()+PIX/2);//海盗中心点
-        if(getLength(p,p2)<=80 && getLength(p,p2)>0){      //80范围内的海盗被溅伤
+        if(getLength(p,p2)<=splashRange && getLength(p,p2)>0){      //范围内的海盗被溅伤
             this->_splashedPointVector.push_back(new Point(p2));//加入一个要画出溅伤的点
             pirate->setLife(pirate->getLife()-damage/4);   //溅伤扣血
         }
@@ -383,10 +437,17 @@ void World1::redBulletEffect(Point &p,int damage){
 }
 
 //萌伊尤的蓝子弹的范围减速效果：传入当前命中目标的中心点,以及减速的到满速的比例
-void World1::blueBulletEffect(Point &p, double percentage){
+void World1::blueBulletEffect(Point &p, double percentage,int type){
+    int waveRange=0;
+    if(type==3){
+        waveRange=100;
+    }
+    else{
+        waveRange=140;
+    }
     for(auto pirate:this->_pirateVector){
         Point p2(pirate->getX()+PIX/2,pirate->getY()+PIX/2);
-        if(getLength(p,p2)<=100){       //100范围内海盗减速
+        if(getLength(p,p2)<=waveRange){       //范围内海盗减速
             this->_wavedPointVector.push_back(new Point(p2));//加入一个要画海浪的点
             if(pirate->getSpeed()!=0){            //该海盗没有被麻痹才能减速
                 pirate->setWaved(true);//减速标记
@@ -416,6 +477,10 @@ World1::~World1()
     delete this->_bag;
     this->_bag=NULL;
 
+    //释放升级框类
+    delete this->_envovleBox;
+    this->_envovleBox=NULL;
+
     //释放精灵数组
     for(auto it = this->_spiritsVector.begin(); it != this->_spiritsVector.end(); it++){
         delete *it;
@@ -442,6 +507,7 @@ void World1::paintEvent(QPaintEvent *){
     DrawPirate(painter);//画出海盗
     DrawSpirits(painter);//画出精灵
     DrawSelectionBox(painter);//画选择框
+    DrawEnvovleBox(painter);//画出升级框
     DrawAddLife(painter);//加血特效
     DrawWave(painter);//减速特效
     DrawSplash(painter);//溅伤特效
@@ -455,6 +521,16 @@ void World1::DrawPuNiAttack(QPainter &painter){
     for(auto spirit:this->_spiritsVector){
         if(spirit->getType()==6){
             if(spirit->getCountFireBlank()>=spirit->getFireBlank()-5){
+                painter.setPen(QColor("gold"));
+                painter.setBrush(QBrush(QColor("gold"),Qt::Dense6Pattern));//填充颜色，透明度
+                painter.drawEllipse(QPoint(spirit->getX()+32, spirit->getY()-32), 96, 12);
+                painter.drawEllipse(QPoint(spirit->getX()+32, spirit->getY()+96), 96, 12);
+                painter.setBrush(Qt::NoBrush);
+            }
+            else continue;
+        }
+        else if(spirit->getType()==12){
+            if(spirit->getCountFireBlank()>=spirit->getFireBlank()-3){
                 painter.setPen(QColor("gold"));
                 painter.setBrush(QBrush(QColor("gold"),Qt::Dense5Pattern));//填充颜色，透明度
                 painter.drawEllipse(QPoint(spirit->getX()+32, spirit->getY()-32), 96, 12);
@@ -517,11 +593,18 @@ void World1::DrawWave(QPainter &painter){
 
 void World1::DrawAddLife(QPainter &painter){
     for(auto spirit:this->_spiritsVector){
-        if(spirit->getCountLifeBlank()>=spirit->getAddLifeBlank()-1){   //到了加血时间
-            if(spirit->getType()==1){                                 //是萌布布种子
+        if(spirit->getCountLifeBlank()>=spirit->getAddLifeBlank()-1){//到了加血时间
+            if(spirit->getType()==1||spirit->getType()==7){//是萌布布种子或其进化形态蒙娜丽莎
+                int range=0;
+                if(spirit->getType()==1){
+                    range=120;
+                }
+                else{
+                    range=200;
+                }
                 painter.setPen(QColor("forestgreen"));
                 painter.setBrush(QBrush(QColor("forestgreen"),Qt::Dense6Pattern));//填充颜色，透明度
-                painter.drawEllipse(QPoint(spirit->getX()+PIX/2, spirit->getY()+PIX/2), spirit->getRange(), spirit->getRange());
+                painter.drawEllipse(QPoint(spirit->getX()+PIX/2, spirit->getY()+PIX/2), range, range);
                 painter.setBrush(Qt::NoBrush);
             }
             else{       //是普通精灵
@@ -664,6 +747,25 @@ void World1::DrawSpirits(QPainter &painter){
     }
 }
 
+void World1::DrawEnvovleBox(QPainter &painter){
+    if(!this->_envovleBox->getDisplay()){
+        return;
+    }
+    else{
+        //画出选择框
+         painter.drawPixmap(this->_envovleBox->getX(),this->_envovleBox->getY(),PIX,3*PIX,QPixmap(this->_envovleBox->getImgPath()));
+
+         //画出子按钮
+         SubButton* copySubButtons = this->_envovleBox->getSubButtons();//接收子按钮结构数组
+         for(int i=0;i<2;i++){
+             painter.drawPixmap(copySubButtons[i].getX(),copySubButtons[i].getY(),PIX,PIX,QPixmap(copySubButtons[i].getImagePath()));
+         }
+
+         painter.setPen(QPen(Qt::yellow, 6, Qt::SolidLine));//设置画笔，黄色，实线
+         painter.drawRect(QRect(this->_envovleBox->getX(),this->_envovleBox->getY()+PIX,PIX,PIX));//将选中区域用黄色实线框起来
+    }
+}
+
 
 void World1::DrawSelectionBox(QPainter &painter){
     //显示选择框
@@ -703,104 +805,242 @@ void World1::setCapsuleOccupied(const Point &p, const int k){
     }
 }
 
+
 //鼠标点击事件
 void World1::mousePressEvent(QMouseEvent *ev){
     if(ev->button()!=Qt::LeftButton){
         return;                          //如果不是鼠标左键点击，则不做反应
     }
     else{
-        //判断选择框6个子按钮的点击
-        SubButton* clickSubButton=this->_bag->getSubButtons();
-        for(int i=0;i<6;i++){
-            //如果点到了背包中的该精灵的位置，且该背包此时是显示出来的情况下
-            if((clickThisBlock(ev->x(),ev->y(),clickSubButton[i].getX(),clickSubButton[i].getY())) && (this->_bag->getDisplay())){
-                this->_bag->setDisplay(false);//准备关掉背包
-
-                //根据i的选择加入新的精灵到Vector中
-                switch (i) {
-                case 0://萌布布种子
-                {
-                    if(this->canBuy(100)){    //够钱
-                        this->_spiritsVector.push_back(new MengBuBuZhongZi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
-                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
-                        this->setCapsuleOccupied(p1,1);
-                    }
-                    break;
-                }
-                case 1://萌火猴
-                {
-                    if(this->canBuy(100)){    //够钱
-                        this->_spiritsVector.push_back(new MengHuoHou(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
-                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
-                        this->setCapsuleOccupied(p1,2);
-                    }
-                    break;
-                }
-                case 2://萌伊尤
-                {
-                    if(this->canBuy(100)){    //够钱
-                        this->_spiritsVector.push_back(new MengYiYou(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
-                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
-                        this->setCapsuleOccupied(p1,3);
-                    }
-                    break;
-                }
-                case 3://雷伊
-                {
-                    if(this->canBuy(500)){    //够钱
-                        this->_spiritsVector.push_back(new LeiYi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
-                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
-                        this->setCapsuleOccupied(p1,4);
-                    }
-                    break;
-                }
-                case 4://英卡洛斯
-                {
-                    if(this->canBuy(700)){
-                        this->_spiritsVector.push_back(new YingKaLuoSi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
-                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
-                        this->setCapsuleOccupied(p1,5);
-                    }
-                    break;
-                }
-                case 5://谱尼
-                {
-                    if(this->canBuy(1000)){
-                        this->_spiritsVector.push_back(new PuNi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
-                        Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
-                        this->setCapsuleOccupied(p1,6);
-                    }
-                    break;
-                }
-                default:break;
-                }
-                update();//更新
-                return;
-            }
-            else continue;
-        }
-
-        //判断塔坑的点击
-        for(auto capsule:this->_capsuleVector){        //遍历所有塔坑
-            //判断点击塔坑
-            if(clickThisBlock(ev->x(),ev->y(),capsule->getX(),capsule->getY())){  //选到了一个塔坑
-                switch (capsule->getOccupied()) {
-                case 0:               //该位置为空
-                {
-                    this->_bag->clickOne(capsule->getX(),capsule->getY());                  //设置选择框位置并显示出来
-                    break;
-                }
-                default:break;
-                }
-                update();//更新
-                return;
-            }
-            else continue;
-        }
-        this->_bag->setDisplay(false);//关闭选择框
-        update();//更新
+        ClickSelectionBox(ev);
+        ClickEnvolveBox(ev);
+        ClickCapsule(ev);
     }
 }
+
+void World1::ClickCapsule(QMouseEvent *&ev){
+    //判断塔坑的点击
+    for(auto capsule:this->_capsuleVector){        //遍历所有塔坑
+        //判断点击塔坑
+        if(clickThisBlock(ev->x(),ev->y(),capsule->getX(),capsule->getY())){  //选到了一个塔坑
+            switch (capsule->getOccupied()) {
+            case 0:               //该位置为空
+            {
+                this->_bag->clickOne(capsule->getX(),capsule->getY());                  //设置选择框位置并显示出来
+                break;
+            }
+            case 1://该位置有萌布布种子
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),1);
+                break;
+            }
+            case 2://该位置有萌火猴
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),2);
+                break;
+            }
+            case 3://萌伊尤
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),3);
+                break;
+            }
+            case 4://雷伊
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),4);
+                break;
+            }
+            case 5://英卡洛斯
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),5);
+                break;
+            }
+            case 6://谱尼
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),6);
+                break;
+            }
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),-1);//不能再进化了
+                break;
+            }
+            default:break;
+            }
+            update();//更新
+            return;
+        }
+        else continue;
+    }
+
+    this->_bag->setDisplay(false);//点击空白处关闭选择框
+    this->_envovleBox->setDisplay(false);//点击空白处关闭
+    update();//更新
+}
+
+void World1::ClickEnvolveBox(QMouseEvent *&ev){
+    //判断升级框2个子按钮的点击
+    SubButton* envSubButtom=this->_envovleBox->getSubButtons();
+    for(int j=0;j<2;j++){
+    //如果点到了该精位置，且该背包此时是显示出来的情况下
+        if((clickThisBlock(ev->x(),ev->y(),envSubButtom[j].getX(),envSubButtom[j].getY())) && (this->_envovleBox->getDisplay())){
+            Point p1(this->_envovleBox->getX(),this->_envovleBox->getY()+PIX);//该出现精灵的位置
+            this->_envovleBox->setDisplay(false);//准备关掉背包
+            //根据j的选择做事
+            if(j==0){//要升级
+                switch (this->_envovleBox->getType()) {
+                case 1://是萌布布种子
+                {
+                    if(this->canBuy(200)){//够钱升级
+                        eraseSpirit(p1);//移除该位置原来的精灵
+                        this->_spiritsVector.push_back(new MengNaLiSha(this->_envovleBox->getX(),this->_envovleBox->getY()+PIX));
+                        this->setCapsuleOccupied(p1,7);
+                    }
+                    else{}
+                    break;
+                }
+                case 2://是萌火猴
+                {
+                    if(this->canBuy(200)){
+                        eraseSpirit(p1);//移除该位置原来的精灵
+                        this->_spiritsVector.push_back(new ChiYanJinGang(this->_envovleBox->getX(),this->_envovleBox->getY()+PIX));
+                        this->setCapsuleOccupied(p1,8);
+                    }
+                    else{}
+                    break;
+                }
+                case 3://萌伊尤
+                {
+                    if(this->canBuy(200)){
+                        eraseSpirit(p1);//移除该位置原来的精灵
+                        this->_spiritsVector.push_back(new LiZhuaLuSiWang(this->_envovleBox->getX(),this->_envovleBox->getY()+PIX));
+                        this->setCapsuleOccupied(p1,9);
+                    }
+                    else{}
+                    break;
+                }
+                case 4://雷伊
+                {
+                    if(this->canBuy(700)){
+                        eraseSpirit(p1);//移除该位置原来的精灵
+                        this->_spiritsVector.push_back(new S_LeiYi(this->_envovleBox->getX(),this->_envovleBox->getY()+PIX));
+                        this->setCapsuleOccupied(p1,10);
+                    }
+                    else{}
+                    break;
+                }
+                case 5://英卡洛斯
+                {
+                    if(this->canBuy(900)){
+                        eraseSpirit(p1);//移除该位置原来的精灵
+                        this->_spiritsVector.push_back(new S_YingKaLuoSi(this->_envovleBox->getX(),this->_envovleBox->getY()+PIX));
+                        this->setCapsuleOccupied(p1,11);
+                    }
+                    else{}
+                    break;
+                }
+                case 6://谱尼
+                {
+                    if(this->canBuy(2000)){
+                        eraseSpirit(p1);//移除该位置原来的精灵
+                        this->_spiritsVector.push_back(new S_PuNi(this->_envovleBox->getX(),this->_envovleBox->getY()+PIX));
+                        this->setCapsuleOccupied(p1,12);
+                    }
+                    else{}
+                    break;
+                }
+                default:break;
+                }
+            }
+            else {   //要删除
+                returnMoney(this->_envovleBox->getType());//返还金钱
+                eraseSpirit(p1);
+                this->setCapsuleOccupied(p1,0);
+            }
+            update();
+            return;
+        }
+        else continue;
+    }
+}
+
+void World1::ClickSelectionBox(QMouseEvent *&ev){
+    //判断选择框6个子按钮的点击
+    SubButton* clickSubButton=this->_bag->getSubButtons();
+    for(int i=0;i<6;i++){
+        //如果点到了背包中的该精灵的位置，且该背包此时是显示出来的情况下
+        if((clickThisBlock(ev->x(),ev->y(),clickSubButton[i].getX(),clickSubButton[i].getY())) && (this->_bag->getDisplay())){
+            this->_bag->setDisplay(false);//准备关掉背包
+
+            //根据i的选择加入新的精灵到Vector中
+            switch (i) {
+            case 0://萌布布种子
+            {
+                if(this->canBuy(100)){    //够钱
+                    this->_spiritsVector.push_back(new MengBuBuZhongZi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                    Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                    this->setCapsuleOccupied(p1,1);
+                }
+                break;
+            }
+            case 1://萌火猴
+            {
+                if(this->canBuy(100)){    //够钱
+                    this->_spiritsVector.push_back(new MengHuoHou(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                    Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                    this->setCapsuleOccupied(p1,2);
+                }
+                break;
+            }
+            case 2://萌伊尤
+            {
+                if(this->canBuy(100)){    //够钱
+                    this->_spiritsVector.push_back(new MengYiYou(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                    Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                    this->setCapsuleOccupied(p1,3);
+                }
+                break;
+            }
+            case 3://雷伊
+            {
+                if(this->canBuy(500)){    //够钱
+                    this->_spiritsVector.push_back(new LeiYi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                    Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                    this->setCapsuleOccupied(p1,4);
+                }
+                break;
+            }
+            case 4://英卡洛斯
+            {
+                if(this->canBuy(700)){
+                    this->_spiritsVector.push_back(new YingKaLuoSi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                    Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                    this->setCapsuleOccupied(p1,5);
+                }
+                break;
+            }
+            case 5://谱尼
+            {
+                if(this->canBuy(1000)){
+                    this->_spiritsVector.push_back(new PuNi(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX));
+                    Point p1(this->_bag->getX()-PIX,this->_bag->getY()+2*PIX);
+                    this->setCapsuleOccupied(p1,6);
+                }
+                break;
+            }
+            default:break;
+            }
+            update();//更新
+            return;
+        }
+        else continue;
+    }
+}
+
 
 bool World1::canBuy(int cost){
     if(cost<=this->_money){
@@ -833,3 +1073,33 @@ int World1::getPirateBlank()const{
     return this->_pirateBlank;
 }
 
+void World1::eraseSpirit(Point &p){
+    for(auto spirit=this->_spiritsVector.begin();spirit<this->_spiritsVector.end();spirit++){
+        if(((*spirit)->getX()==p.getX())&&((*spirit)->getY()==p.getY())){
+            this->_spiritsVector.erase(spirit);
+            break;
+        }
+        else continue;
+    }
+}
+
+void World1::returnMoney(const int type){
+    int money=0;
+    switch (type) {
+    case 1:
+    case 2:
+    case 3:money=10;break;
+    case 4:money=50;break;
+    case 5:
+    case 10:money=70;break;
+    case 6:money=100;break;
+    case 7:
+    case 8:
+    case 9:money=20;break;
+    case 11:money=90;break;
+    case 12:money=200;break;
+    default:break;
+    }
+    this->_money += money;//增加金钱
+    this->_moneyLabel->setText(QString("金钱：%1").arg(this->_money));//刷新标签
+}

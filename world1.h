@@ -13,6 +13,7 @@
 #include "spirits.h"
 #include "selectionbox.h"
 #include "point.h"
+#include "envovlebox.h"            //进化以及回收精灵按钮
 
 class World1 : public QMainWindow
 {
@@ -21,8 +22,6 @@ public:
     explicit World1(QWidget *parent = nullptr);
     ~World1();
 
-    void paintEvent(QPaintEvent *);//绘图事件
-    bool clickThisBlock(int mouseX,int mouseY,int blockX,int blockY);//判断鼠标点击位置是否在当前方格内，是返回true
 private:
     int _count=0;//计算海盗的数量，决定出现新的海盗以及游戏结束
     int _money=200;//初始钱数
@@ -50,6 +49,7 @@ private:
     QLabel* _loseLabel=new QLabel(this);//失败标签
 
     SelectionBox* _bag=new SelectionBox(":/Image/pictures/bag.png"); //选择框类
+    EnvovleBox* _envovleBox=new EnvovleBox(":/Image/pictures/envovleBox.png");//升级框类
 
     int getPirateBlank()const;
 
@@ -58,6 +58,7 @@ private:
     void DrawPirate(QPainter& painter);//画出海盗
     void DrawSpirits(QPainter& painter);//画出精灵
     void DrawSelectionBox(QPainter& painter);//画出选择框
+    void DrawEnvovleBox(QPainter& painter);//画出升级框
     void DrawAddLife(QPainter& painter);//加血特效
     void DrawSplash(QPainter& painter);//溅伤特效
     void DrawWave(QPainter& painter);//海浪特效
@@ -75,14 +76,21 @@ private:
     void allPirateFindTarget();//控制界面所有海盗找目标
     void bingoSpiritEvent();//击中精灵后如何处理
     void addLifeEvent();//精灵的加血技能事件
-    void redBulletEffect(Point& p, int damage);//萌火猴的红子弹范围溅伤效果,溅伤精灵攻击力的四分之一
-    void blueBulletEffect(Point& p, double percentage);//萌伊尤的蓝子弹范围减速效果,(按比例减少)
+    void redBulletEffect(Point& p, int damage, int type);//萌火猴的红子弹范围溅伤效果,溅伤精灵攻击力的四分之一
+    void blueBulletEffect(Point& p, double percentage, int type);//萌伊尤的蓝子弹范围减速效果,(按比例减少)
+    void eraseSpirit(Point& p);//移除p位置的精灵
+    void ClickSelectionBox(QMouseEvent* &ev);//点击选择框按键
+    void ClickEnvolveBox(QMouseEvent* &ev);//点击升级框
+    void ClickCapsule(QMouseEvent* &ev);//点击精灵胶囊
+    void returnMoney(const int type);//根据移除的精灵类型返还钱(原价值的十分之一)
 
     bool canBuy(int cost);//判断是否能购买，能即true
     bool inRange(int distance,int range);//判断是否进入攻击范围
     bool isBingo(Point&bulletP,Point&targetP);//判断子弹是否击中目标
+    bool clickThisBlock(int mouseX,int mouseY,int blockX,int blockY);//判断鼠标点击位置是否在当前方格内，是返回true
 
-    void mousePressEvent(QMouseEvent* ev);//鼠标点击事件
+    void mousePressEvent(QMouseEvent*ev);//鼠标点击事件
+    void paintEvent(QPaintEvent *);//绘图事件
 
 signals:
 
