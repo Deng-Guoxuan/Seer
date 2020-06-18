@@ -9,8 +9,8 @@ S_PuNi::S_PuNi(int x, int y):Spirits(x,y)
     this->_countBlank=20;
     this->_imagePath=QString(":/Image/pictures/S_PuNi.png");
     this->_rangeColor="gold";
-    this->_life=500;
-    this->_fullLife=500;
+    this->_life=800;
+    this->_fullLife=800;
     this->_addLifeBlank=4;
     this->_countLifeBlank=4;//一开始可以加血
     this->_addLife=80;//每次加80血

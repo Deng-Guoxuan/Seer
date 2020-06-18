@@ -1,6 +1,8 @@
 #ifndef WORLD1_H
 #define WORLD1_H
 
+//地图1
+
 #include <QMainWindow>
 #include <QPainter>                //画家
 #include <Qtimer>                  //定时器
@@ -23,16 +25,15 @@ public:
     ~World1();
 
 private:
+    int _map=1;//地图1
     int _count=0;//计算海盗的数量，决定出现新的海盗以及游戏结束
     int _money=200;//初始钱数
     int _life=5;//基地生命值
-
-
     int _pirateBlank=3000;//插入海盗的间隔时间,根据海盗难度调整
 
+    bool _theEnd=false;//结束标记
     bool _displayAllSpiritRange=false;//一键显示所有精灵攻击范围
     bool _displayAllPirateRange=false;//一键显示所有海盗攻击范围
-    bool _theEnd=false;//结束标记
     bool _displayPirateLifeBar=false;//一键显示所有海盗血条
     bool _displaySpiritLifeBar=false;//一键显示所有精灵血条
 

@@ -16,11 +16,14 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void paintEvent(QPaintEvent*);//重载
-
 private:
     Ui::MainWindow *ui;
+
+    bool _displayHandbook=false;//打开精灵手册
+    void paintEvent(QPaintEvent*);//重载
     void DrawInterface(QPainter&painter);
+    void DrawHandbook(QPainter&painter);
+
 };
 
 #endif // MAINWINDOW_H

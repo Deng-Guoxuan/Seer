@@ -52,5 +52,14 @@
         <file>pictures/swordBullet.png</file>
         <file>pictures/thunderBullet.png</file>
         <file>pictures/lock.png</file>
+        <file>pictures/music.png</file>
+        <file>pictures/quiet.png</file>
+        <file>pictures/handbook.png</file>
+        <file>pictures/spirits.png</file>
+        <file>pictures/ironBullet.png</file>
+        <file>pictures/silverBullet.png</file>
+        <file>pictures/skeleton.png</file>
+        <file>pictures/skeletonBullet.png</file>
+        <file>pictures/Map2.png</file>
     </qresource>
 </RCC>

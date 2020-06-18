@@ -1,6 +1,8 @@
 #ifndef SUBBUTTON_H
 #define SUBBUTTON_H
 
+//选择框中的每一个按钮的结构体
+
 #include "point.h"
 #include <QString>
 

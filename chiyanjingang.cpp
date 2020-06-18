@@ -9,8 +9,8 @@ ChiYanJinGang::ChiYanJinGang(int x, int y):Spirits(x,y)
     this->_countBlank=4;
     this->_imagePath=QString(":/Image/pictures/ChiYanJinGang.png");
     this->_rangeColor="red";
-    this->_life=200;
-    this->_fullLife=200;
+    this->_life=350;
+    this->_fullLife=350;
     this->_addLifeBlank=8;
     this->_countLifeBlank=0;//一开始不可以加血
     this->_addLife=10;//每次加10血

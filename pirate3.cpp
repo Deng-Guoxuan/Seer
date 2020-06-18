@@ -9,7 +9,7 @@ Pirate3::Pirate3(Point **path, int pathLength, Point &p):
     this->_speed=6;
     this->_fullSpeed=6;
     this->_imagePath=":/Image/pictures/pirate3.png";
-    this->_reward=60;
+    this->_reward=200;
     this->_range=140;
     this->_fireBlank=15;
     this->_countBlank=15;

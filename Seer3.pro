@@ -65,7 +65,16 @@ SOURCES += \
     s_yingkaluosi.cpp \
     sunbullet.cpp \
     thunderbullet.cpp \
-    swordbullet.cpp
+    swordbullet.cpp \
+    pirate4.cpp \
+    pirate5.cpp \
+    pirate6.cpp \
+    pirate7.cpp \
+    pirate8.cpp \
+    ironbullet.cpp \
+    silverbullet.cpp \
+    skeletonbullet.cpp \
+    world2.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -107,7 +116,16 @@ HEADERS += \
     s_yingkaluosi.h \
     sunbullet.h \
     thunderbullet.h \
-    swordbullet.h
+    swordbullet.h \
+    pirate4.h \
+    pirate5.h \
+    pirate6.h \
+    pirate7.h \
+    pirate8.h \
+    ironbullet.h \
+    silverbullet.h \
+    skeletonbullet.h \
+    world2.h
 
 FORMS += \
         mainwindow.ui

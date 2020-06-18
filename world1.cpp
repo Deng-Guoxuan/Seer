@@ -1,7 +1,7 @@
 #include "world1.h"
 
 #include "ui_mainwindow.h"
-#include "capsule.h"    //精灵房子位置
+#include "capsule.h"         //精灵胶囊
 #include "mengbubuzhongzi.h" //萌布布种子
 #include "windows.h"
 #include "menghuohou.h"
@@ -18,13 +18,18 @@
 #include "pirate1.h"
 #include "pirate2.h"
 #include "pirate3.h"
+#include "pirate4.h"
+#include "pirate5.h"
+#include "pirate6.h"
+#include "pirate7.h"
+#include "pirate8.h"
 
 const int PIX=64;//一格64像素
 
 World1::World1(QWidget *parent) : QMainWindow(parent)
 {
     setFixedSize(1152,640);//设置窗口大小
-    setWindowTitle("Seer");//设置窗口名称
+    setWindowTitle("Map1");//设置窗口名称
 
     setMap1();//设定地图
 
@@ -59,6 +64,38 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
     player->setVolume(30);
     player->play();
 
+    //声音播放键
+    QPushButton* playMusic = new QPushButton(this);
+    //静音按钮
+    QPushButton* stopMusic = new QPushButton(this);
+
+    playMusic->setGeometry(17*PIX,5*PIX,PIX,PIX);//位置
+    playMusic->setIconSize(QSize(64,64));
+    playMusic->setStyleSheet("border:Opx;");
+    playMusic->setIcon(QIcon(":/Image/pictures/music.png"));
+
+    connect(playMusic,&QPushButton::clicked,[=]()
+    {
+        player->play();
+        playMusic->hide();
+        stopMusic->show();
+        update();
+    });
+
+    stopMusic->setGeometry(17*PIX,5*PIX,PIX,PIX);//位置
+    stopMusic->setIconSize(QSize(64,64));
+    stopMusic->setStyleSheet("border:Opx;");
+    stopMusic->setIcon(QIcon(":/Image/pictures/quiet.png"));
+
+    connect(stopMusic,&QPushButton::clicked,[=]()
+    {
+        player->stop();
+        stopMusic->hide();
+        playMusic->show();
+        update();
+    });
+
+
     QTimer* timer1 = new QTimer(this);      //用于插入海盗定时器
     timer1->start(this->getPirateBlank());      //插入海盗的间隔时间
     connect(timer1,&QTimer::timeout,[=](){                          //设置路径点
@@ -89,10 +126,13 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
     QTimer* timer2=new QTimer(this);
     timer2->start(150);
     connect(timer2,&QTimer::timeout,[=](){
-        if(this->_theEnd){          //结束标记
+        if(this->_theEnd){
+            player->stop();
             Sleep(5000);
             this->close();
         }
+        else{}
+
         this->allPiratesMove();//界面所有海盗移动
         this->allPirateFindTarget();//界面所有海盗找目标
         this->bingoSpiritEvent();//击中精灵事件
@@ -119,13 +159,7 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
     connect(timer4,&QTimer::timeout,[=](){
         this->addLifeEvent();
     });
-/*
-    QTimer* timer5=new QTimer(this);
-    timer5->start(150);//与上面刷新时间保持一致
-    connect(timer5,&QTimer::timeout,[=](){
-        this->PuNiFireEvent();
-    });
-*/
+
     //一键显示所有精灵攻击范围按钮
     QPushButton* displayAllSpiritRangePush = new QPushButton(this);
     displayAllSpiritRangePush->setStyleSheet("color:black");
@@ -180,14 +214,12 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
 
 }
 
-
 //补血事件
 void World1::addLifeEvent(){
     for(auto spirit:this->_spiritsVector){
         spirit->addLife(this->_spiritsVector);
     }
 }
-
 
 //击中精灵事件
 void World1::bingoSpiritEvent(){
@@ -198,8 +230,10 @@ void World1::bingoSpiritEvent(){
                 Point p2((*spirit)->getX()+PIX/2,(*spirit)->getY()+PIX/2);   //精灵中心
                 if(this->isBingo(p1,p2)){                    //击中
                     (*spirit)->setLife((*spirit)->getLife()-(*bullet)->getAttack());//扣血
-                    pirate->eraseBullet(bullet);                  //删去子弹
-
+                    if((*bullet)->getType()!=6){//6为刀子弹,具有穿透功能
+                        pirate->eraseBullet(bullet);                  //删去子弹
+                    }
+                    else{}
                     if((*spirit)->getLife()<=0){        //精灵没血了
                         Point p1((*spirit)->getX(),(*spirit)->getY());
                         this->setCapsuleOccupied(p1,0);                  //解除精灵胶囊的占用
@@ -213,7 +247,6 @@ void World1::bingoSpiritEvent(){
         }
     }
 }
-
 
 //击中海盗事件
 void World1::bingoPirateEvent(){
@@ -286,7 +319,7 @@ void World1::bingoPirateEvent(){
                     }
                     case 11://水子弹：蓝子弹的升级版,减速范围更大,减速更多,伤害更高
                     {
-                        blueBulletEffect(p1,0.3,11);
+                        blueBulletEffect(p1,0.5,11);
                         (*pirate)->setLife((*pirate)->getLife()-(*bullet)->getAttack());//扣血
                         spirit->eraseBullet(bullet);
                         break;
@@ -336,7 +369,6 @@ void World1::bingoPirateEvent(){
     }
 }
 
-
 //界面所有海盗找目标
 void World1::allPirateFindTarget(){
     //海盗寻找目标精灵的规律：找到最近的一个精灵作为目标
@@ -352,7 +384,6 @@ void World1::allPirateFindTarget(){
         }
     }
 }
-
 
 //界面所有精灵找目标
 void World1::allSpiritsFindTarget(){
@@ -379,11 +410,11 @@ void World1::allSpiritsFindTarget(){
                     spirit->setTarget(NULL); //目标置为空
                 }
                 else{               //目标在攻击范围内
-                    spirit->addBullet();//一直增加子弹
+                    spirit->addBullet(this->_map);//一直增加子弹
                 }
             }
         }
-        else spirit->addBullet();//谱尼一直增加子弹
+        else spirit->addBullet(this->_map);//谱尼一直增加子弹
     }
 }
 
@@ -406,7 +437,7 @@ void World1::allPiratesMove(){
 
             if(this->_life<=0){
                 this->_loseLabel->show();
-                this->_theEnd=true;
+                this->_theEnd=true;//失败
             }
             else{}
             break;
@@ -497,6 +528,7 @@ World1::~World1()
         delete *it;
         *it=NULL;
     }
+
 }
 
 //绘图事件
@@ -666,6 +698,21 @@ void World1::addPirate(int pirateType, Point **path, int pathLength,Point& start
     case 3:
         this->_pirateVector.push_back(new Pirate3(path,pathLength,startPoint));
         break;
+    case 4:
+        this->_pirateVector.push_back(new Pirate4(path,pathLength,startPoint));
+        break;
+    case 5:
+        this->_pirateVector.push_back(new Pirate5(path,pathLength,startPoint));
+        break;
+    case 6:
+        this->_pirateVector.push_back(new Pirate6(path,pathLength,startPoint));
+        break;
+    case 7:
+        this->_pirateVector.push_back(new Pirate7(path,pathLength,startPoint));
+        break;
+    case 8:
+        this->_pirateVector.push_back(new Pirate8(path,pathLength,startPoint));
+        break;
     default:
         break;
     }
@@ -694,10 +741,54 @@ void World1::setPiratesWave(Point **path1, Point **path2, Point *entrance, int*p
         addPirate(3,ways[0],pathLengths[0],entrance[0]);
         addPirate(3,ways[1],pathLengths[1],entrance[2]);
     }
-    else if(this->_count>=26){
+    else if(this->_count>=26&& this->_count<=29){
+        this->setPirateBlank(4000);
+        addPirate(4,ways[0],pathLengths[0],entrance[0]);
+        addPirate(4,ways[1],pathLengths[1],entrance[2]);
+    }
+    else if(this->_count>=30&& this->_count<=32){
+        this->setPirateBlank(3000);
+        addPirate(5,ways[0],pathLengths[0],entrance[0]);
+        addPirate(5,ways[1],pathLengths[1],entrance[2]);
+    }
+    else if(this->_count>=33&& this->_count<=38){
+        this->setPirateBlank(4000);
+        addPirate(1,ways[0],pathLengths[0],entrance[0]);
+        addPirate(2,ways[0],pathLengths[0],entrance[2]);
+        addPirate(1,ways[1],pathLengths[1],entrance[1]);
+        addPirate(2,ways[1],pathLengths[1],entrance[3]);
+    }
+    else if(this->_count>=39&& this->_count<=42){
+        this->setPirateBlank(3000);
+        addPirate(4,ways[0],pathLengths[0],entrance[0]);
+        addPirate(4,ways[1],pathLengths[1],entrance[2]);
+    }
+    else if(this->_count>=43&& this->_count<=45){
+        this->setPirateBlank(5000);
+        addPirate(6,ways[0],pathLengths[0],entrance[0]);
+        addPirate(6,ways[1],pathLengths[1],entrance[2]);
+    }
+    else if(this->_count>=46 && this->_count<=52){
+        this->setPirateBlank(4000);
+        addPirate(1,ways[0],pathLengths[0],entrance[0]);
+        addPirate(2,ways[0],pathLengths[0],entrance[2]);
+        addPirate(1,ways[1],pathLengths[1],entrance[1]);
+        addPirate(2,ways[1],pathLengths[1],entrance[3]);
+    }
+    else if(this->_count>=53&& this->_count<=54){
+        this->setPirateBlank(5000);
+        addPirate(8,ways[0],pathLengths[0],entrance[0]);
+        addPirate(8,ways[1],pathLengths[1],entrance[2]);
+    }
+    else if(this->_count>=55&& this->_count<=57){
+        this->setPirateBlank(3000);
+        addPirate(7,ways[0],pathLengths[0],entrance[0]);
+        addPirate(7,ways[1],pathLengths[1],entrance[2]);
+    }
+    else if(this->_count>=58){
         if(this->_pirateVector.empty()){                 //海盗出完了,且海盗打完了
             this->_winLabel->show();
-            this->_theEnd=true;
+            this->_theEnd=true;//胜利
         }
     }
     this->_count++;          //计数器+1
@@ -766,7 +857,6 @@ void World1::DrawEnvovleBox(QPainter &painter){
     }
 }
 
-
 void World1::DrawSelectionBox(QPainter &painter){
     //显示选择框
     if (!this->_bag->getDisplay()){
@@ -804,7 +894,6 @@ void World1::setCapsuleOccupied(const Point &p, const int k){
         else continue;
     }
 }
-
 
 //鼠标点击事件
 void World1::mousePressEvent(QMouseEvent *ev){
@@ -1040,7 +1129,6 @@ void World1::ClickSelectionBox(QMouseEvent *&ev){
         else continue;
     }
 }
-
 
 bool World1::canBuy(int cost){
     if(cost<=this->_money){

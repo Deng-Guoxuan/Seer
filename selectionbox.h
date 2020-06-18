@@ -1,6 +1,8 @@
 #ifndef SELECTIONBOX_H
 #define SELECTIONBOX_H
 
+//精灵选择框
+
 #include "point.h"
 #include "subbutton.h"
 

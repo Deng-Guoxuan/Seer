@@ -1,6 +1,11 @@
 #include "pirates.h"
 #include "blackbullet.h"
 #include "brownbullet.h"
+#include "waterbullet.h"
+#include "ironbullet.h"
+#include "knifebullet.h"
+#include "silverbullet.h"
+#include "skeletonbullet.h"
 
 const int PIX=64;
 
@@ -176,9 +181,8 @@ void Pirates::setCountBlank(const int t){
 
 //输入一个精灵的中心点
 void Pirates::addBullet(Point&targetP){
-    this->_countBlank++;
-
     if(this->_countBlank<this->getFireBlank()){ //没有达到时间间隔,不用新建子弹
+        this->_countBlank++;
         return;
     }
     else{
@@ -199,6 +203,31 @@ void Pirates::addBullet(Point&targetP){
             this->_bulletVector.push_back(new BrownBullet(p1,targetP));
             break;
         }
+        case 4:
+        {
+            this->_bulletVector.push_back(new WaterBullet(p1,targetP));
+            break;
+        }
+        case 5:
+        {
+            this->_bulletVector.push_back(new IronBullet(p1,targetP));
+            break;
+        }
+        case 6:
+        {
+            this->_bulletVector.push_back(new SilverBullet(p1,targetP));
+            break;
+        }
+        case 7:
+        {
+            this->_bulletVector.push_back(new KnifeBullet(p1,targetP));
+            break;
+        }
+        case 8:
+        {
+            this->_bulletVector.push_back(new SkeletonBullet(p1,targetP));
+            break;
+        }
         default:
             break;
         }
@@ -214,12 +243,14 @@ void Pirates::fireBullets(){
     }
 
     //遍历删除越界子弹
-    for(auto bullet = this->_bulletVector.begin(); bullet != this->_bulletVector.end(); bullet++)
+    for(auto bullet = this->_bulletVector.begin(); bullet != this->_bulletVector.end(); bullet++){
         if((*bullet)->getX()<0 || (*bullet)->getX()>18*PIX || (*bullet)->getY()>10*PIX || (*bullet)->getY()<0)
         {
             this->_bulletVector.erase(bullet);
             break;
         }
+        else continue;
+    }
 }
 
 void Pirates::eraseBullet(Bullet **bullet){

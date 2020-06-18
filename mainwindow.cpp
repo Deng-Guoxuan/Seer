@@ -33,6 +33,20 @@ MainWindow::MainWindow(QWidget *parent) :
         interface->show(); //关卡显示
     });
 
+    //精灵图鉴
+    QPushButton* handbook=new QPushButton(this);
+    handbook->setGeometry(950,300,57,57);
+    handbook->setIconSize(QSize(57,57));
+    handbook->setStyleSheet("border:Opx;");
+    handbook->setIcon(QIcon(":/Image/pictures/handbook.png"));
+    connect(handbook, &QPushButton::clicked, [=]()
+    {
+        this->_displayHandbook ? this->_displayHandbook = false : this->_displayHandbook = true;
+            update();
+    });
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -44,9 +58,22 @@ void MainWindow::paintEvent(QPaintEvent *){
     QPainter painter(this);
 
     DrawInterface(painter);
+    DrawHandbook(painter);
 }
 
 void MainWindow::DrawInterface(QPainter &painter){
     painter.drawPixmap(0,0,1068,600,QPixmap(":/Image/pictures/startform.png"));
     painter.drawPixmap(750,440,250,158,QPixmap(":/Image/pictures/logo.png"));
+
+}
+
+void MainWindow::DrawHandbook(QPainter &painter){
+    if(this->_displayHandbook){
+        painter.setPen(QColor("grey"));
+        painter.setBrush(QBrush(QColor("grey"),Qt::Dense3Pattern));//填充颜色，透明度
+        painter.drawRect(60,60,350,375);
+        painter.setBrush(Qt::NoBrush);
+        painter.setPen(Qt::NoPen);
+        painter.drawPixmap(60,60,350,375,QPixmap(":/Image/pictures/spirits.png"));
+    }
 }

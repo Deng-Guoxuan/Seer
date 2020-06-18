@@ -1,6 +1,8 @@
 #ifndef ENVOVLEBOX_H
 #define ENVOVLEBOX_H
 
+//进化以及移除精灵的选择框
+
 #include "point.h"
 #include "subbutton.h"
 

@@ -1,10 +1,12 @@
 #include "interface.h"
 #include <QMediaPlayer>
 #include "world1.h"
+#include "world2.h"
 
 Interface::Interface(QWidget *parent) : QMainWindow(parent)
 {
     this->setFixedSize(500,330);
+    setWindowTitle("Level Selection");//设置窗口名称
 
     QMediaPlayer* loginBGM=new QMediaPlayer(this);
     loginBGM->setMedia(QUrl("qrc:/Music/sounds/loginBGM.mp3"));
@@ -17,7 +19,6 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent)
     map1->setIconSize(QSize(195,195));
     map1->setStyleSheet("border:Opx;");
     map1->setIcon(QIcon(":/Image/pictures/login1.png"));
-
 
     connect(map1, &QPushButton::clicked, [=]()
     {
@@ -33,6 +34,17 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent)
     map2->setIconSize(QSize(195,195));
     map2->setStyleSheet("border:Opx;");
     map2->setIcon(QIcon(":/Image/pictures/login2.png"));
+
+    connect(map2, &QPushButton::clicked, [=]()
+    {
+        //点击按钮进入关卡
+        World2 *world2 = new World2;
+        loginBGM->stop();
+        world2->setAttribute(Qt::WA_DeleteOnClose);//提前设置好该窗口关闭的时候释放内存
+        world2->show(); //关卡显示
+    });
+
+
 }
 
 void Interface::paintEvent(QPaintEvent *){

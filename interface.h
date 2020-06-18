@@ -1,8 +1,9 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include <QMainWindow>
+//关卡选择界面
 
+#include <QMainWindow>
 
 class Interface : public QMainWindow
 {

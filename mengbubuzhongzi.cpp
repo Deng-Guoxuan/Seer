@@ -11,8 +11,8 @@ MengBuBuZhongZi::MengBuBuZhongZi(int x, int y):Spirits(x,y)
     this->_countBlank=10;
     this->_imagePath=QString(":/Image/pictures/MengBuBuZhongZi.png");
     this->_rangeColor="green";
-    this->_life=150;
-    this->_fullLife=150;
+    this->_life=200;
+    this->_fullLife=200;
     this->_addLifeBlank=3;
     this->_countLifeBlank=3;//一开始就可以加血
     this->_addLife=40;//每次加40血

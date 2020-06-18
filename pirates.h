@@ -1,7 +1,7 @@
 #ifndef PIRATES_H
 #define PIRATES_H
 
-//
+//海盗父类
 
 #include <QString>
 #include <QVector>

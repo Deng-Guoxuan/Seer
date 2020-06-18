@@ -14,11 +14,19 @@
 
 const int PIX=64;//一格的像素
 
-Point directions[]={Point(0,0),Point(0,2*PIX),Point(0,4*PIX),Point(0,6*PIX),Point(0,8*PIX),Point(0,10*PIX),
-                    Point(18*PIX,0),Point(18*PIX,2*PIX),Point(18*PIX,4*PIX),Point(18*PIX,6*PIX),Point(18*PIX,8*PIX),Point(10*PIX,18*PIX),
+Point directions1[]={Point(0,0),Point(0,2*PIX),Point(0,4*PIX),Point(0,6*PIX),Point(0,8*PIX),Point(0,10*PIX),
+                    Point(18*PIX,0),Point(18*PIX,2*PIX),Point(18*PIX,4*PIX),Point(18*PIX,6*PIX),Point(18*PIX,8*PIX),Point(18*PIX,10*PIX),
                     Point(0,0),Point(2*PIX,0),Point(4*PIX,0),Point(6*PIX,0),Point(8*PIX,0),Point(10*PIX,0),Point(12*PIX,0),Point(14*PIX,0),Point(16*PIX,0),Point(18*PIX,0),
                     Point(0,10*PIX),Point(2*PIX,10*PIX),Point(4*PIX,10*PIX),Point(6*PIX,10*PIX),Point(8*PIX,10*PIX),Point(10*PIX,10*PIX),Point(12*PIX,10*PIX),Point(14*PIX,10*PIX),Point(16*PIX,10*PIX),Point(18*PIX,10*PIX)};
-const int dirL=sizeof(directions)/sizeof(Point);
+
+Point directions2[]={Point(0,0),Point(0,2*PIX),Point(0,4*PIX),Point(0,6*PIX),Point(0,8*PIX),Point(0,10*PIX),
+                    Point(16*PIX,0),Point(16*PIX,2*PIX),Point(16*PIX,4*PIX),Point(16*PIX,6*PIX),Point(16*PIX,8*PIX),Point(16*PIX,10*PIX),
+                    Point(0,0),Point(2*PIX,0),Point(4*PIX,0),Point(6*PIX,0),Point(8*PIX,0),Point(10*PIX,0),Point(12*PIX,0),Point(14*PIX,0),Point(16*PIX,0),
+                    Point(0,10*PIX),Point(2*PIX,10*PIX),Point(4*PIX,10*PIX),Point(6*PIX,10*PIX),Point(8*PIX,10*PIX),Point(10*PIX,10*PIX),Point(12*PIX,10*PIX),Point(14*PIX,10*PIX),Point(16*PIX,10*PIX)};
+
+
+const int dirL1=sizeof(directions1)/sizeof(Point);
+const int dirL2=sizeof(directions2)/sizeof(Point);
 
 Spirits::Spirits(int x, int y):_p(x,y){}
 
@@ -116,7 +124,7 @@ void Spirits::addLife(QVector<Spirits *> &spiritsVector){
     this->_countLifeBlank=0;//归零
 }
 
-void Spirits::addBullet(){
+void Spirits::addBullet(int map){
     this->_countBlank++;
 
     if(this->_countBlank<this->getFireBlank()){ //没有达到时间间隔
@@ -184,14 +192,25 @@ void Spirits::addBullet(){
             }
         }
         else{                                  //谱尼或S_谱尼增加子弹
+            int dirL=0;
+            Point* direction;
+            if(map==1){
+                direction=directions1;
+                dirL=dirL1;
+            }
+            else{
+                direction=directions2;
+                dirL=dirL2;
+            }
+
             if(this->_type==6){
                 for(int i=0;i<dirL;i++){
-                    this->_bulletVector.push_back(new ShiningBullet(p1,directions[i]));
+                    this->_bulletVector.push_back(new ShiningBullet(p1,direction[i]));
                 }
             }
             else{
                 for(int i=0;i<dirL;i++){
-                    this->_bulletVector.push_back(new SunBullet(p1,directions[i]));
+                    this->_bulletVector.push_back(new SunBullet(p1,direction[i]));
                 }
             }
         }

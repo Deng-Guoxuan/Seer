@@ -2,6 +2,7 @@
 #define BULLET_H
 
 //子弹编号：1绿,2红,3蓝,4黑,5电,6刀,7棕,8光,9花,10火,11水,12雷,13剑,14阳
+//15铁,16银,17骨
 
 #include "point.h"
 #include <QString>

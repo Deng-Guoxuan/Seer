@@ -1,6 +1,8 @@
 #ifndef SHININGBULLET_H
 #define SHININGBULLET_H
 
+//光子弹：无特殊效果
+
 #include "bullet.h"
 
 class ShiningBullet : public Bullet

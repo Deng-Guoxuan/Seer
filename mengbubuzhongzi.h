@@ -1,8 +1,9 @@
 #ifndef MENGBUBUZHONGZI_H
 #define MENGBUBUZHONGZI_H
 
-#include "spirits.h"
+//精灵：萌布布种子，帮助小范围内精灵回血
 
+#include "spirits.h"
 
 class MengBuBuZhongZi : public Spirits
 {

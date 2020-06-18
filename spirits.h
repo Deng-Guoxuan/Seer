@@ -1,6 +1,7 @@
 #ifndef SPIRITS_H
 #define SPIRITS_H
 
+//精灵类
 //精灵编号：1萌布布种子,2萌火猴,3萌伊尤,4雷伊,5英卡洛斯,6谱尼
 //        7蒙娜丽莎,8炽焰金刚,9利爪鲁斯王,10S_雷伊,11S_英卡洛斯,12S_谱尼
 
@@ -27,7 +28,7 @@ public:
     int getCountLifeBlank()const;
 
     void setTarget(Pirates* target);//设置当前精灵的目标怪物
-    void addBullet(); //新建子弹
+    void addBullet(int map); //新建子弹(根据地图类型不同调整谱尼攻击方向)
     void fireBullets();//管理该精灵所有子弹的移动
     void eraseBullet(Bullet** bullet);//删除第i个子弹
     void setLife(const int life);
