@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include <QLabel>
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +23,8 @@ private:
     void paintEvent(QPaintEvent*);//重载
     void DrawInterface(QPainter&painter);
     void DrawHandbook(QPainter&painter);
+    QLabel* _seer=NULL;
+    QLabel* _maker=NULL;
 
 };
 

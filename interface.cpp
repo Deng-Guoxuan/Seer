@@ -7,6 +7,7 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent)
 {
     this->setFixedSize(500,330);
     setWindowTitle("Level Selection");//设置窗口名称
+    this->setWindowIcon(QIcon(":/Image/pictures/base.png"));
 
     QMediaPlayer* loginBGM=new QMediaPlayer(this);
     loginBGM->setMedia(QUrl("qrc:/Music/sounds/loginBGM.mp3"));

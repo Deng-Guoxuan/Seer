@@ -30,6 +30,7 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
 {
     setFixedSize(1152,640);//设置窗口大小
     setWindowTitle("Map1");//设置窗口名称
+    this->setWindowIcon(QIcon(":/Image/pictures/base.png"));
 
     setMap1();//设定地图
 
@@ -775,17 +776,17 @@ void World1::setPiratesWave(Point **path1, Point **path2, Point *entrance, int*p
         addPirate(1,ways[1],pathLengths[1],entrance[1]);
         addPirate(2,ways[1],pathLengths[1],entrance[3]);
     }
-    else if(this->_count>=53&& this->_count<=54){
+    else if(this->_count>=53&& this->_count<=53){
         this->setPirateBlank(5000);
         addPirate(8,ways[0],pathLengths[0],entrance[0]);
         addPirate(8,ways[1],pathLengths[1],entrance[2]);
     }
-    else if(this->_count>=55&& this->_count<=57){
+    else if(this->_count>=54&& this->_count<=55){
         this->setPirateBlank(3000);
         addPirate(7,ways[0],pathLengths[0],entrance[0]);
         addPirate(7,ways[1],pathLengths[1],entrance[2]);
     }
-    else if(this->_count>=58){
+    else if(this->_count>=56){
         if(this->_pirateVector.empty()){                 //海盗出完了,且海盗打完了
             this->_winLabel->show();
             this->_theEnd=true;//胜利

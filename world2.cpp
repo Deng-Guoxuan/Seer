@@ -30,6 +30,7 @@ World2::World2(QWidget *parent) : QMainWindow(parent)
 {
     setFixedSize(1024,640);//设置窗口大小
     setWindowTitle("Map2");//设置窗口名称
+    this->setWindowIcon(QIcon(":/Image/pictures/base.png"));
 
     setMap2();//设定地图
 
@@ -768,31 +769,31 @@ void World2::setPiratesWave(Point **path1, Point **path2, Point *entrance, int*p
         addPirate(1,ways[1],pathLengths[1],entrance[1]);
         addPirate(2,ways[1],pathLengths[1],entrance[3]);
     }
-    else if(this->_count>=68&& this->_count<=75){
+    else if(this->_count>=68&& this->_count<=71){
         this->setPirateBlank(5000);
         addPirate(8,ways[0],pathLengths[0],entrance[0]);
         addPirate(8,ways[1],pathLengths[1],entrance[2]);
     }
-    else if(this->_count>=76&& this->_count<=82){
+    else if(this->_count>=72&& this->_count<=78){
         this->setPirateBlank(3000);
         addPirate(7,ways[0],pathLengths[0],entrance[0]);
         addPirate(7,ways[1],pathLengths[1],entrance[2]);
     }
-    else if(this->_count>=83&& this->_count<=83){
+    else if(this->_count>=79&& this->_count<=79){
         this->setPirateBlank(4000);
         addPirate(1,ways[0],pathLengths[0],entrance[0]);
         addPirate(2,ways[1],pathLengths[1],entrance[2]);
         addPirate(3,ways[0],pathLengths[0],entrance[1]);
         addPirate(4,ways[1],pathLengths[1],entrance[3]);
     }
-    else if(this->_count>=84&& this->_count<=84){
+    else if(this->_count>=80&& this->_count<=80){
         this->setPirateBlank(3000);
         addPirate(5,ways[0],pathLengths[0],entrance[0]);
         addPirate(6,ways[1],pathLengths[1],entrance[2]);
         addPirate(7,ways[0],pathLengths[0],entrance[1]);
         addPirate(8,ways[1],pathLengths[1],entrance[3]);
     }
-    else if(this->_count>=85){
+    else if(this->_count>=81){
         if(this->_pirateVector.empty()){                 //海盗出完了,且海盗打完了
             this->_winLabel->show();
             this->_theEnd=true;//胜利

@@ -61,5 +61,6 @@
         <file>pictures/skeleton.png</file>
         <file>pictures/skeletonBullet.png</file>
         <file>pictures/Map2.png</file>
+        <file>pictures/pirates.png</file>
     </qresource>
 </RCC>

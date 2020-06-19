@@ -134,3 +134,7 @@ RESOURCES += \
     pics.qrc \
     snds.qrc
 
+DISTFILES += \
+    icon.rc
+
+RC_FILE += icon.rc
