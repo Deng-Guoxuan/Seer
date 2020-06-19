@@ -32,6 +32,18 @@ World2::World2(QWidget *parent) : QMainWindow(parent)
     setWindowTitle("Map2");//设置窗口名称
     this->setWindowIcon(QIcon(":/Image/pictures/base.png"));
 
+    //精灵图鉴
+    QPushButton* handbook=new QPushButton(this);
+    handbook->setGeometry(3*PIX,0,PIX,PIX);
+    handbook->setIconSize(QSize(PIX,PIX));
+    handbook->setStyleSheet("border:Opx;");
+    handbook->setIcon(QIcon(":/Image/pictures/handbook.png"));
+    connect(handbook, &QPushButton::clicked, [=]()
+    {
+        this->_displayHandbook ? this->_displayHandbook = false : this->_displayHandbook = true;
+        update();
+    });
+
     setMap2();//设定地图
 
     this->_moneyLabel->setGeometry(10*PIX,0.75*PIX,3*PIX,PIX/2);//位置
@@ -541,6 +553,7 @@ void World2::paintEvent(QPaintEvent *){
     DrawPirateLifeBar(painter);//海盗血条
     DrawLighting(painter);//雷电特效
     DrawPuNiAttack(painter);//谱尼攻击特效
+    DrawHandbook(painter);
 }
 
 void World2::DrawPuNiAttack(QPainter &painter){
@@ -1200,3 +1213,15 @@ void World2::returnMoney(const int type){
     this->_moneyLabel->setText(QString("金钱：%1").arg(this->_money));//刷新标签
 }
 
+void World2::DrawHandbook(QPainter &painter){
+    if(this->_displayHandbook){
+        painter.setPen(QColor("gray"));
+        painter.setBrush(QBrush(QColor("dimgray"),Qt::Dense2Pattern));//填充颜色，透明度
+        painter.drawRect(160,2.5*PIX,700,375);
+        painter.setBrush(Qt::NoBrush);
+        painter.setPen(Qt::NoPen);
+        painter.drawPixmap(160,2.5*PIX,350,375,QPixmap(":/Image/pictures/spirits.png"));
+        painter.drawPixmap(510,2.5*PIX,320,217,QPixmap(":/Image/pictures/pirates.png"));
+    }
+    else{}
+}

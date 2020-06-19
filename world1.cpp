@@ -34,6 +34,18 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
 
     setMap1();//设定地图
 
+    //精灵图鉴
+    QPushButton* handbook=new QPushButton(this);
+    handbook->setGeometry(17*PIX,6*PIX,PIX,PIX);
+    handbook->setIconSize(QSize(PIX,PIX));
+    handbook->setStyleSheet("border:Opx;");
+    handbook->setIcon(QIcon(":/Image/pictures/handbook.png"));
+    connect(handbook, &QPushButton::clicked, [=]()
+    {
+        this->_displayHandbook ? this->_displayHandbook = false : this->_displayHandbook = true;
+        update();
+    });
+
     this->_moneyLabel->setGeometry(10*PIX,0.75*PIX,3*PIX,PIX/2);//位置
     this->_moneyLabel->setFont(QFont("微软雅黑",12,75));//字体，大小，粗细
     this->_moneyLabel->setStyleSheet("background-color:whitesmoke;color:goldenrod");//背景颜色，字体颜色
@@ -548,6 +560,7 @@ void World1::paintEvent(QPaintEvent *){
     DrawPirateLifeBar(painter);//海盗血条
     DrawLighting(painter);//雷电特效
     DrawPuNiAttack(painter);//谱尼攻击特效
+    DrawHandbook(painter);
 }
 
 void World1::DrawPuNiAttack(QPainter &painter){
@@ -731,14 +744,14 @@ void World1::setPiratesWave(Point **path1, Point **path2, Point *entrance, int*p
         addPirate(2,ways[1],pathLengths[1],entrance[3]);
     }
     else if(this->_count>=17 && this->_count<=22){
-        this->setPirateBlank(4000);
+        this->setPirateBlank(4500);
         addPirate(1,ways[0],pathLengths[0],entrance[0]);
         addPirate(2,ways[0],pathLengths[0],entrance[2]);
         addPirate(1,ways[1],pathLengths[1],entrance[1]);
         addPirate(2,ways[1],pathLengths[1],entrance[3]);
     }
     else if(this->_count>=23&& this->_count<=25){
-        this->setPirateBlank(2500);
+        this->setPirateBlank(3000);
         addPirate(3,ways[0],pathLengths[0],entrance[0]);
         addPirate(3,ways[1],pathLengths[1],entrance[2]);
     }
@@ -1191,4 +1204,17 @@ void World1::returnMoney(const int type){
     }
     this->_money += money;//增加金钱
     this->_moneyLabel->setText(QString("金钱：%1").arg(this->_money));//刷新标签
+}
+
+void World1::DrawHandbook(QPainter &painter){
+    if(this->_displayHandbook){
+        painter.setPen(QColor("grey"));
+        painter.setBrush(QBrush(QColor("white"),Qt::Dense3Pattern));//填充颜色，透明度
+        painter.drawRect(240,3*PIX,700,375);
+        painter.setBrush(Qt::NoBrush);
+        painter.setPen(Qt::NoPen);
+        painter.drawPixmap(240,3*PIX,350,375,QPixmap(":/Image/pictures/spirits.png"));
+        painter.drawPixmap(590,3*PIX,320,217,QPixmap(":/Image/pictures/pirates.png"));
+    }
+    else{}
 }

@@ -88,8 +88,8 @@ void MainWindow::DrawHandbook(QPainter &painter){
     if(this->_displayHandbook){
         this->_seer->hide();
         this->_maker->hide();
-        painter.setPen(QColor("grey"));
-        painter.setBrush(QBrush(QColor("grey"),Qt::Dense2Pattern));//填充颜色，透明度
+        painter.setPen(QColor("dimgray"));
+        painter.setBrush(QBrush(QColor("dimgray"),Qt::Dense2Pattern));//填充颜色，透明度
         painter.drawRect(180,60,700,375);
         painter.setBrush(Qt::NoBrush);
         painter.setPen(Qt::NoPen);

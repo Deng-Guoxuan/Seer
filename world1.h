@@ -36,6 +36,7 @@ private:
     bool _displayAllPirateRange=false;//一键显示所有海盗攻击范围
     bool _displayPirateLifeBar=false;//一键显示所有海盗血条
     bool _displaySpiritLifeBar=false;//一键显示所有精灵血条
+    bool _displayHandbook=false;
 
     const Point _base=Point(192,128);//基地位置，敌人进入即游戏结束（可以设置最大进入人数）
 
@@ -67,6 +68,7 @@ private:
     void DrawPirateLifeBar(QPainter& painter);//海盗血条
     void DrawLighting(QPainter& painter);//雷电特效
     void DrawPuNiAttack(QPainter& painter);//谱尼攻击特效
+    void DrawHandbook(QPainter& painter);//手册
     void setPiratesWave(Point **path1, Point **path2, Point *entrance, int* pathLengths);//设置每波海盗的形式
     void setCapsuleOccupied(const Point&p,const int k);//标记已有精灵的胶囊
     void setPirateBlank(const int blank);
