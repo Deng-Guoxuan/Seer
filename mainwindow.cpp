@@ -51,8 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //精灵图鉴
     QPushButton* handbook=new QPushButton(this);
-    handbook->setGeometry(950,300,57,57);
-    handbook->setIconSize(QSize(57,57));
+    handbook->setGeometry(950,300,64,64);
+    handbook->setIconSize(QSize(64,64));
     handbook->setStyleSheet("border:Opx;");
     handbook->setIcon(QIcon(":/Image/pictures/handbook.png"));
     connect(handbook, &QPushButton::clicked, [=]()

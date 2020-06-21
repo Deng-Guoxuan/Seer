@@ -141,7 +141,7 @@ World1::World1(QWidget *parent) : QMainWindow(parent)
     connect(timer2,&QTimer::timeout,[=](){
         if(this->_theEnd){
             player->stop();
-            Sleep(5000);
+            Sleep(10000);
             this->close();
         }
         else{}
@@ -963,13 +963,33 @@ void World1::ClickCapsule(QMouseEvent *&ev){
                 break;
             }
             case 7:
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),7);//不能再进化了
+                break;
+            }
             case 8:
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),8);//不能再进化了
+                break;
+            }
             case 9:
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),9);//不能再进化了
+                break;
+            }
             case 10:
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),10);//不能再进化了
+                break;
+            }
             case 11:
+            {
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),11);//不能再进化了
+                break;
+            }
             case 12:
             {
-                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),-1);//不能再进化了
+                this->_envovleBox->clickOne(capsule->getX(),capsule->getY(),12);//不能再进化了
                 break;
             }
             default:break;
@@ -1188,15 +1208,15 @@ void World1::eraseSpirit(Point &p){
 void World1::returnMoney(const int type){
     int money=0;
     switch (type) {
-    case 1:
-    case 2:
+    case 1:money=10;break;
+    case 2:money=10;break;
     case 3:money=10;break;
     case 4:money=50;break;
-    case 5:
+    case 5:money=70;break;
     case 10:money=70;break;
     case 6:money=100;break;
-    case 7:
-    case 8:
+    case 7:money=20;break;
+    case 8:money=20;break;
     case 9:money=20;break;
     case 11:money=90;break;
     case 12:money=200;break;

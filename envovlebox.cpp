@@ -59,7 +59,12 @@ void EnvovleBox::clickOne(int x, int y, int id)
         this->_subButtons[0].setImagePath(":/Image/pictures/S_PuNi.png");//进化版：S谱尼
         break;
     }
-    case -1:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
     {
         this->_subButtons[0].setX(this->getX());
         this->_subButtons[0].setY(this->getY());

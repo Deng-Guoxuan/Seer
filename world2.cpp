@@ -135,7 +135,7 @@ World2::World2(QWidget *parent) : QMainWindow(parent)
     connect(timer2,&QTimer::timeout,[=](){
         if(this->_theEnd){
             player->stop();
-            Sleep(5000);
+            Sleep(10000);
             this->close();
         }
         else{}
