@@ -21,17 +21,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->_seer=new QLabel(this);
     this->_seer->setGeometry(220,100,625,300);
-    this->_seer->setFont(QFont("微软雅黑",150,75));//字体，大小，粗细
+    this->_seer->setFont(QFont("微软雅黑",100,75));//字体，大小，粗细
     this->_seer->setStyleSheet("color:yellow");//背景颜色，字体颜色
     this->_seer->setAlignment(Qt::AlignCenter);//居中
-    this->_seer->setText(QString("Seer"));
+    this->_seer->setText(QString("Seer塔防"));
 
     this->_maker=new QLabel(this);
     this->_maker->setGeometry(300,400,468,100);
     this->_maker->setFont(QFont("微软雅黑",20,20));//字体，大小，粗细
     this->_maker->setStyleSheet("color:yellow");//背景颜色，字体颜色
     this->_maker->setAlignment(Qt::AlignCenter);//居中
-    this->_maker->setText(QString("制作人：RUC邓国翾"));
+    this->_maker->setText(QString("制作人：RUC 小猪不拱白菜"));
 
     QPushButton *start=new QPushButton(this);
     start->setGeometry(400,500,268,60);

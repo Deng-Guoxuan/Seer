@@ -53,7 +53,7 @@ protected:
     int _id;//海盗种类
     int _speed;//移动速度(会变)
     int _fullSpeed;//满速
-    int _norSpdBlank=50;
+    int _norSpdBlank=50;//恢复正常速度的时间间隔
     int _range;//攻击范围
     int _fireBlank;//攻击间隔
     int _countBlank=0;//时刻变化调整计算攻击间隔
